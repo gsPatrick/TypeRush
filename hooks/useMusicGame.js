@@ -20,7 +20,9 @@ import * as sfx from "@/lib/audio/sfx";
  * Performance: rAF chama tick(); React só re-renderiza quando a linha muda,
  * o jogador digita, ou para o relógio da janela (escrito via ref).
  */
-export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime }) {
+export const ON_FIRE_STREAK = 10;
+
+export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime, mode = "normal", onOffsetChange }) {
   const lines = useMemo(() => buildLines(parseLrc(track.synced)), [track.synced]);
   const engineRef = useRef(null);
   const [, bump] = useReducer((x) => x + 1, 0);
@@ -52,7 +54,8 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
     const saved = recordSong(track.id, result);
     setOutcome({ result, ...saved });
     setStatus("over");
-    sfx.playEnd(saved.isRecord);
+    if (result.failed) sfx.playEnd(false);
+    else sfx.playEnd(saved.isRecord);
   }, [track.id]);
 
   const handle = useCallback(
@@ -63,10 +66,26 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
         if (ev.type === "line") {
           changed = true;
           if (ev.perfect) {
-            if (ev.streak > 0 && ev.streak % 5 === 0) sfx.playCombo();
-            else sfx.playCorrect(ev.streak);
+            if (ev.streak === ON_FIRE_STREAK) sfx.playOverdriveStart();
+            else if (ev.streak > 0 && ev.streak % 5 === 0) sfx.playCombo();
+            else sfx.playCorrect(ev.streak, ev.streak >= ON_FIRE_STREAK);
+          } else if (ev.strike) {
+            sfx.playWrong();
+          } else if (ev.lostStreak >= ON_FIRE_STREAK) {
+            sfx.playOverdriveEnd(false);
           }
-          setJuice({ id: ++juiceId.current, index: ev.index, perfect: ev.perfect, completion: ev.completion });
+          setJuice({
+            id: ++juiceId.current,
+            index: ev.index,
+            perfect: ev.perfect,
+            completion: ev.completion,
+            score: ev.score,
+            multiplier: ev.multiplier,
+            streak: ev.streak,
+            milestone: ev.perfect && ev.streak > 0 && ev.streak % 5 === 0 ? ev.streak : 0,
+            strike: ev.strike,
+            livesLeft: ev.livesLeft,
+          });
         }
         if (ev.type === "end") {
           finish();
@@ -79,7 +98,7 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
   );
 
   const start = useCallback(() => {
-    engineRef.current = createMusicEngine(lines);
+    engineRef.current = createMusicEngine(lines, { mode });
     const first = lines[0]?.t ?? 0;
     silentStart.current = performance.now() - Math.max(0, first - 3) * 1000;
     lastAudio.current = 0;
@@ -87,7 +106,35 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
     setJuice(null);
     setStatus("playing");
     sfx.setSfxVolume(0.45);
-  }, [lines]);
+  }, [lines, mode]);
+
+  /**
+   * Ajusta o atraso no meio do jogo. Se o ajuste fizer a letra pular para a
+   * frente, as linhas puladas saem da conta (não são erro).
+   */
+  const resync = useCallback(
+    (nextOffset) => {
+      offsetRef.current = nextOffset;
+      onOffsetChange?.(nextOffset);
+      const e = engineRef.current;
+      if (e && e.state.status === "running") {
+        e.skipBefore(lyricTime());
+        bump();
+      }
+    },
+    [lyricTime, onOffsetChange]
+  );
+
+  /** "O cantor começou a próxima linha AGORA": acerta o atraso por ela. */
+  const syncNow = useCallback(() => {
+    const e = engineRef.current;
+    if (!e || e.state.status !== "running") return;
+    const audio = hasAudioRef.current ? lastAudio.current : lyricTime() + offsetRef.current;
+    const now = lyricTime();
+    const next = lines.find((l, i) => !e.state.grades[i] && l.t >= now - 0.6) || lines.find((l, i) => !e.state.grades[i]);
+    if (!next) return;
+    resync(Math.round((audio - next.t) * 10) / 10);
+  }, [lines, lyricTime, resync]);
 
   useEffect(() => () => sfx.setSfxVolume(0.9), []);
 
@@ -136,6 +183,13 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
     perfects: s?.perfects ?? 0,
     juice,
     outcome,
+    multiplier: s ? Math.min(3, 1 + Math.floor((s.streak || 0) / 5) * 0.5) : 1,
+    onFire: (s?.streak ?? 0) >= ON_FIRE_STREAK,
+    mode: s?.mode ?? mode,
+    livesLeft: s ? s.lives - s.strikes : 3,
+    lives: s?.lives ?? 3,
+    resync,
+    syncNow,
     onInput,
     subscribeTime,
     lyricTime,

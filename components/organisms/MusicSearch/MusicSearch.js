@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import CoverArt from "@/components/atoms/CoverArt/CoverArt";
 import { formatDuration } from "@/lib/music/lrc";
 import { getAllBest, getRecent } from "@/lib/music/storage";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -80,9 +81,8 @@ export default function MusicSearch({ onPick }) {
         {list.map((r) => (
           <li key={r.id}>
             <button type="button" className={styles.item} onClick={() => onPick(r)}>
-              <span className={styles.cover}>
-                {r.cover ? <img src={r.cover} alt="" width={52} height={52} loading="lazy" /> : <span aria-hidden="true">♪</span>}
-              </span>
+              {/* recorde: o do modo normal; se só jogou no 3 vidas, o dele */}
+              <CoverArt src={r.cover} artist={r.artist} track={r.track} className={styles.cover} />
               <span className={styles.titles}>
                 <b>{r.track}</b>
                 <span>
@@ -91,12 +91,12 @@ export default function MusicSearch({ onPick }) {
                 </span>
               </span>
               <span className={styles.meta}>
-                {best[r.id] ? (
-                  <span className={styles.played} title={`${m.best}: ${best[r.id].score}`}>
-                    <b className={styles[`r${best[r.id].rank}`]}>{best[r.id].rank}</b>
+                {(best[r.id] || best[`${r.id}:lives`]) ? (
+                  <span className={styles.played} title={`${m.best}: ${(best[r.id] || best[`${r.id}:lives`]).score}`}>
+                    <b className={styles[`r${(best[r.id] || best[`${r.id}:lives`]).rank}`]}>{(best[r.id] || best[`${r.id}:lives`]).rank}</b>
                     <span>
-                      {best[r.id].score} {m.score}
-                      <em>{best[r.id].completion}%</em>
+                      {(best[r.id] || best[`${r.id}:lives`]).score} {m.score}
+                      <em>{(best[r.id] || best[`${r.id}:lives`]).completion}%</em>
                     </span>
                   </span>
                 ) : (

@@ -58,7 +58,7 @@
   flex-direction: column;
   align-items: center;
   gap: clamp(12px, 2.2vh, 24px);
-  min-height: clamp(190px, 26vh, 300px);
+  min-height: clamp(160px, 23vh, 300px);
   padding: var(--space-2) 0;
   text-align: center;
 }
@@ -219,4 +219,154 @@
 
 @media (prefers-reduced-motion: reduce) {
   .flash, .shake, .bump { animation: none; }
+}
+
+/* ── dopamina ───────────────────────────────────────────── */
+
+.activeWrap {
+  position: relative;
+}
+
+.fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.plus {
+  position: absolute;
+  top: -0.2em;
+  right: 12%;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  color: var(--color-lime);
+  text-shadow: 0 0 18px rgba(206, 247, 158, 0.6);
+  animation: plusUp 1s var(--ease-out-expo) forwards;
+}
+
+@keyframes plusUp {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.9); }
+  20%  { opacity: 1; transform: translateY(0) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-34px) scale(1); }
+}
+
+/* no marco, a linha anterior cede o lugar para a faixa (sem sobrepor) */
+.yield {
+  animation: yield 1.4s linear both;
+}
+
+@keyframes yield {
+  0%, 85% { opacity: 0; }
+  100%    { opacity: 0.8; }
+}
+
+.banner {
+  position: absolute;
+  top: calc(-1 * clamp(12px, 2.2vh, 24px) - 1.6em);
+  left: 50%;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-lime);
+  transform: translateX(-50%);
+  animation: banner 1.4s var(--ease-out-expo) forwards;
+  pointer-events: none;
+}
+
+.banner small {
+  font-size: 1.5rem;
+  letter-spacing: 0;
+}
+
+@keyframes banner {
+  0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.8); }
+  18%  { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+  70%  { opacity: 1; transform: translate(-50%, -4px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -14px) scale(1); }
+}
+
+.mult {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-graphite);
+}
+
+.multOn {
+  color: var(--color-lime);
+  animation: bump 420ms var(--ease-out-expo);
+}
+
+/* em chamas: aura lime atrás da letra, respirando */
+.onFire::before {
+  content: "";
+  position: absolute;
+  inset: -40px -10%;
+  z-index: -1;
+  border-radius: 40px;
+  background: radial-gradient(60% 55% at 50% 60%, rgba(206, 247, 158, 0.12), transparent 70%);
+  animation: breathe 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.onFire .active .correct {
+  color: var(--color-lime);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
+}
+
+/* 3 vidas */
+.lives {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.heart {
+  width: 18px;
+  height: 18px;
+  fill: var(--color-graphite);
+  transition: fill var(--duration-base);
+}
+
+.heart.alive {
+  fill: var(--color-red);
+}
+
+.breaking {
+  animation: heartBreak 600ms var(--ease-out-expo);
+}
+
+@keyframes heartBreak {
+  0%   { transform: scale(1.6); fill: var(--color-red); }
+  40%  { transform: scale(0.8) rotate(-12deg); }
+  100% { transform: none; }
+}
+
+.strikeFlash {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 50%, transparent 50%, rgba(255, 93, 93, 0.28) 100%);
+  animation: strike 600ms var(--ease-out-expo) forwards;
+}
+
+@keyframes strike {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx, .banner { display: none; }
+  .onFire::before, .breaking, .multOn, .strikeFlash { animation: none; }
+  .strikeFlash { opacity: 0; }
 }

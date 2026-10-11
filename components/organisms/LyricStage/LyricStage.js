@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import Burst from "@/components/molecules/Burst/Burst";
 import { diffWord, toChars } from "@/lib/game/text";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./LyricStage.module.css";
@@ -14,7 +15,11 @@ import styles from "./LyricStage.module.css";
  * Driver:    tempo da letra (subscribeTime, rAF) — barras e contagem são
  *            escritas direto no DOM; React só re-renderiza em tecla/linha
  * Estados:   intro (antes da 1ª linha) · linha ativa · instrumental (vão)
- * Reduced:   sem flash/tremor; cores e barras continuam
+ * Juice:     linha perfeita → faíscas + "+pontos" subindo; a cada 5 seguidas
+ *            uma faixa de marco e o multiplicador sobe (×1,5 … ×3); 10 seguidas
+ *            = "em chamas" (aura lime); erro no modo 3 vidas → coração quebra
+ *            + flash vermelho
+ * Reduced:   sem flash/tremor/faíscas; cores e barras continuam
  */
 export default function LyricStage({ game, duration }) {
   const { t } = useLocale();
@@ -81,15 +86,28 @@ export default function LyricStage({ game, duration }) {
   const done = active >= 0 && grades[active];
   const firstLinePending = !grades.some(Boolean) && active < 0;
 
+  const fresh = juice && game.status === "playing" ? juice : null;
+
   return (
-    <section className={styles.root} aria-label={m.title}>
+    <section className={`${styles.root} ${game.onFire ? styles.onFire : ""}`} aria-label={m.title}>
+      {fresh?.strike ? <span key={`s${fresh.id}`} className={styles.strikeFlash} aria-hidden="true" /> : null}
       <div className={styles.songBar} aria-hidden="true">
         <span ref={songBarRef} />
       </div>
 
       <div className={styles.hud}>
+        {game.mode === "lives" ? (
+          <span className={styles.lives} aria-label={`${game.livesLeft} ${m.lives}`}>
+            {Array.from({ length: game.lives }, (_, i) => (
+              <Heart key={i} alive={i < game.livesLeft} breaking={fresh?.strike && i === game.livesLeft} />
+            ))}
+          </span>
+        ) : null}
         <span>
           <b>{game.score}</b> {m.score}
+        </span>
+        <span key={`m${game.multiplier}`} className={`${styles.mult} ${game.multiplier > 1 ? styles.multOn : ""}`}>
+          ×{game.multiplier}
         </span>
         <span>
           <b>{game.perfects}</b> {m.perfect}
@@ -107,7 +125,7 @@ export default function LyricStage({ game, duration }) {
           key={prev ? `p${prevIndex}-${juice?.id ?? 0}` : "p"}
           className={`${styles.prev} ${prev?.grade.perfect ? styles.perfect : prev ? styles.partial : ""} ${
             juice && juice.index === prevIndex ? (juice.perfect ? styles.flash : styles.shake) : ""
-          }`}
+          } ${fresh?.milestone ? styles.yield : ""}`}
         >
           {prev ? (
             <>
@@ -120,6 +138,18 @@ export default function LyricStage({ game, duration }) {
         </p>
 
         <div className={styles.activeWrap}>
+          {fresh?.perfect ? (
+            <span key={`f${fresh.id}`} className={styles.fx} aria-hidden="true">
+              <Burst id={fresh.id} x="50%" y="40%" kind={fresh.milestone ? "combo" : "correct"} />
+              <span className={styles.plus}>+{fresh.score}</span>
+            </span>
+          ) : null}
+          {fresh?.milestone ? (
+            <span key={`b${fresh.id}`} className={styles.banner} aria-live="polite">
+              {fresh.milestone >= 10 ? m.onFire : m.combo(fresh.milestone)}
+              <small>×{game.multiplier}</small>
+            </span>
+          ) : null}
           {line ? (
             <p className={`${styles.active} ${done ? styles.activeDone : ""}`}>
               <ActiveLine text={line.text} typed={input} done={!!done} />
@@ -184,5 +214,18 @@ function ActiveLine({ text, typed, done }) {
       ))}
       {!done && pos >= letters.length ? <span className={`${styles.caret} ${styles.caretEnd}`}>{"​"}</span> : null}
     </>
+  );
+}
+
+function Heart({ alive, breaking }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`${styles.heart} ${alive ? styles.alive : ""} ${breaking ? styles.breaking : ""}`}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 7.9 3.6 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.4 0 5.6 3.4 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" />
+    </svg>
   );
 }

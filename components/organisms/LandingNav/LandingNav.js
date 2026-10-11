@@ -14,8 +14,7 @@ import styles from "./LandingNav.module.css";
 const LINKS = [
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Mecânicas", href: "#mecanicas" },
-  { label: "Duelo", href: "/duel" },
-  { label: "Música", href: "/music" },
+  { label: "Modos", href: "#modos" },
 ];
 
 export default function LandingNav() {

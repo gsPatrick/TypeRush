@@ -9,7 +9,7 @@ import LyricStage from "@/components/organisms/LyricStage/LyricStage";
 import MusicResults from "@/components/organisms/MusicResults/MusicResults";
 import useMusicGame from "@/hooks/useMusicGame";
 import { formatDuration } from "@/lib/music/lrc";
-import { getOffset, pushRecent, setOffset as saveOffset } from "@/lib/music/storage";
+import { getMusicMode, getOffset, pushRecent, setMusicMode, setOffset as saveOffset } from "@/lib/music/storage";
 import { parseYouTubeId } from "@/lib/music/youtube";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./MusicSession.module.css";
@@ -34,12 +34,13 @@ export default function MusicSession({ pick, onBack }) {
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState(false);
   const [changingVideo, setChangingVideo] = useState(false);
+  const [mode, setMode] = useState("normal");
   const playerRef = useRef(null);
 
   // letra + mídia em paralelo
   useEffect(() => {
     let alive = true;
-    setOffsetState(getOffset(pick.id));
+    setMode(getMusicMode());
     const q = new URLSearchParams({ artist: pick.artist, track: pick.track, duration: String(pick.duration), album: pick.album || "" });
     Promise.all([
       fetch(`/api/music/track?id=${pick.id}`).then(async (r) => (r.ok ? r.json() : Promise.reject(await r.json()))),
@@ -62,11 +63,26 @@ export default function MusicSession({ pick, onBack }) {
   }, [pick, m]);
 
   const hasAudio = !!videoId && !silent;
+
+  // o atraso é do par letra + vídeo: trocou o vídeo, carrega o dele
+  useEffect(() => {
+    setOffsetState(getOffset(pick.id, hasAudio ? videoId : null));
+  }, [pick.id, videoId, hasAudio]);
+
+  const persistOffset = useCallback(
+    (v) => {
+      setOffsetState(v);
+      saveOffset(pick.id, hasAudio ? videoId : null, v);
+    },
+    [pick.id, videoId, hasAudio]
+  );
   const game = useMusicGame({
     track: track ?? { id: pick.id, synced: "" },
     offset,
     hasAudio,
     getAudioTime: () => playerRef.current?.time() ?? null,
+    mode,
+    onOffsetChange: persistOffset,
   });
 
   const start = useCallback(() => {
@@ -84,10 +100,13 @@ export default function MusicSession({ pick, onBack }) {
     setPhase("playing");
   }, [track, pick, media, hasAudio, game, m]);
 
-  // fim do jogo → resultado (a música segue tocando o final)
+  // fim do jogo → resultado (a música segue tocando o final; se falhou, para)
   useEffect(() => {
-    if (game.status === "over" && phase === "playing") setPhase("results");
-  }, [game.status, phase]);
+    if (game.status === "over" && phase === "playing") {
+      if (game.outcome?.result.failed) playerRef.current?.pause();
+      setPhase("results");
+    }
+  }, [game.status, game.outcome, phase]);
 
   // Enter começa; Esc sai do jogo
   useEffect(() => {
@@ -101,10 +120,15 @@ export default function MusicSession({ pick, onBack }) {
         game.stop();
         setPhase("ready");
       }
+      // Tab: "o cantor começou a próxima linha agora" (Tab não serve para digitar)
+      if (phase === "playing" && e.key === "Tab" && hasAudio) {
+        e.preventDefault();
+        game.syncNow();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, start, game]);
+  }, [phase, start, game, hasAudio]);
 
   const onPlayerState = useCallback(
     (ev) => {
@@ -131,10 +155,16 @@ export default function MusicSession({ pick, onBack }) {
     setChangingVideo(false);
   };
 
+  // ±60s: dá conta de vídeo com introdução bem diferente da letra
   const nudge = (delta) => {
-    const v = Math.max(-5, Math.min(5, Math.round((offset + delta) * 10) / 10));
-    setOffsetState(v);
-    saveOffset(pick.id, v);
+    const v = Math.max(-60, Math.min(60, Math.round((offset + delta) * 10) / 10));
+    if (phase === "playing") game.resync(v);
+    else persistOffset(v);
+  };
+
+  const chooseMode = (next) => {
+    setMode(next);
+    setMusicMode(next);
   };
 
   if (error) {
@@ -228,14 +258,29 @@ export default function MusicSession({ pick, onBack }) {
                 {linkError ? <p className={styles.err}>{m.badLink}</p> : null}
               </div>
 
+              <div className={styles.modeBox}>
+                <span className={styles.label}>{m.modeLabel}</span>
+                <div className={styles.modeRow} role="radiogroup" aria-label={m.modeLabel}>
+                  {["normal", "lives"].map((id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="radio"
+                      aria-checked={mode === id}
+                      className={`${styles.modeOpt} ${mode === id ? styles.modeOn : ""}`}
+                      onClick={() => chooseMode(id)}
+                    >
+                      <b>{m.modes[id].name}</b>
+                      <span>{m.modes[id].rule}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {hasAudio ? (
                 <div className={styles.offset}>
                   <span className={styles.label}>{m.offset}</span>
-                  <div className={styles.offsetRow}>
-                    <button type="button" onClick={() => nudge(-0.1)}>− {m.earlier}</button>
-                    <b>{m.offsetHint(offset)}</b>
-                    <button type="button" onClick={() => nudge(0.1)}>{m.later} +</button>
-                  </div>
+                  <OffsetControl value={offset} onNudge={nudge} m={m} />
                 </div>
               ) : null}
 
@@ -263,6 +308,14 @@ export default function MusicSession({ pick, onBack }) {
             <>
               <LyricStage game={game} duration={info.duration} />
               {audioHint ? <p className={styles.hint}>{audioHint}</p> : null}
+              {hasAudio ? (
+                <div className={styles.syncBar}>
+                  <button type="button" className={styles.syncBtn} onClick={game.syncNow}>
+                    {m.syncNow} <Kbd>tab</Kbd>
+                  </button>
+                  <OffsetControl value={offset} onNudge={nudge} m={m} compact />
+                </div>
+              ) : null}
             </>
           ) : null}
 
@@ -272,6 +325,7 @@ export default function MusicSession({ pick, onBack }) {
               track={info}
               media={media}
               hasAudio={hasAudio}
+              mode={mode}
               onAgain={start}
               onAnother={onBack}
             />
@@ -288,6 +342,19 @@ export default function MusicSession({ pick, onBack }) {
           </p>
         </section>
       </div>
+    </div>
+  );
+}
+
+/** Ajuste do atraso: ±1s para corrigir rápido, ±0,1s para o fino. */
+function OffsetControl({ value, onNudge, m, compact = false }) {
+  return (
+    <div className={`${styles.offsetRow} ${compact ? styles.offsetCompact : ""}`}>
+      <button type="button" onClick={() => onNudge(-1)} aria-label={`${m.earlier} 1s`}>−1s</button>
+      <button type="button" onClick={() => onNudge(-0.1)} aria-label={`${m.earlier} 0.1s`}>−.1</button>
+      <b title={m.syncHint}>{m.offsetHint(value)}</b>
+      <button type="button" onClick={() => onNudge(0.1)} aria-label={`${m.later} 0.1s`}>+.1</button>
+      <button type="button" onClick={() => onNudge(1)} aria-label={`${m.later} 1s`}>+1s</button>
     </div>
   );
 }
