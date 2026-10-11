@@ -15,6 +15,7 @@ const LINKS = [
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Mecânicas", href: "#mecanicas" },
   { label: "Duelo", href: "/duel" },
+  { label: "Música", href: "/music" },
 ];
 
 export default function LandingNav() {

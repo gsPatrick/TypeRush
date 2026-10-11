@@ -14,6 +14,9 @@ export default function Header({ combo, onToggleCombo, lang, onChangeLanguage, s
         <BrandMark className={styles.brand} />
       </Link>
       <div className={styles.right}>
+        <Link href="/music" className={styles.duel}>
+          {t.music.nav}
+        </Link>
         <Link href="/duel" className={styles.duel}>
           {t.duel.nav}
         </Link>

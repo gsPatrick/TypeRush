@@ -14,6 +14,26 @@ npm run dev     # http://localhost:3017  (landing) · /play (jogo)
 | `/` | landing — o jogo se jogando sozinho no herói, regras "digitadas" pelo scroll |
 | `/play` | o jogo |
 | `/duel` | duelo online 1×1 — sala com código/link, P2P |
+| `/music` | modo música — digite a letra no tempo do cantor |
+
+## Modo música
+
+Busca a música → letra completa e **sincronizada** do [LRCLIB](https://lrclib.net)
+(grátis, sem chave) → áudio do YouTube → cada linha aparece no tempo em que é
+cantada; digite antes da próxima chegar.
+
+- **Rotas (serverless na Vercel):** `/api/music/search`, `/api/music/track`
+  (LRCLIB, com nova tentativa no 503) e `/api/music/media` (capa via Deezer,
+  link "ouvir no Spotify", vídeo do YouTube). Respostas cacheadas na CDN.
+- **Sincronia:** a letra é marcada sobre uma gravação específica. O vídeo é
+  escolhido pela **duração** mais próxima da versão da letra, preferindo canais
+  "- Topic" (áudio oficial) e evitando cover/karaokê/ao vivo. Ajuste fino
+  "adiantar/atrasar" por música, salvo no navegador.
+- **Áudio automático** precisa de `YOUTUBE_API_KEY` (ver `.env.example`). Sem a
+  chave: colar link do YouTube ou jogar só com a letra.
+- **Crédito:** capa, artista e "Ouvir no Spotify" no preparo, no jogo e no resultado.
+- **Letras:** vêm da comunidade (LRCLIB), sem licença de editora — o modo é
+  gratuito e credita o artista, mas isso não substitui licença.
 
 ## Duelo online (P2P, sem servidor)
 
@@ -47,6 +67,8 @@ lib/game/            lógica pura — sem React, testável em Node
   storage.js         recordes e totais
   rng.js             aleatório com semente (duelo)
 lib/duel/            modos, juiz, resumo de partida, códigos de sala
+lib/music/           LRC → linhas digitáveis, motor de linhas, player do YouTube, recordes
+lib/music/server/    LRCLIB, casamento de vídeo no YouTube, capa/crédito
 hooks/useTypeRush.js ponte motor ↔ React (relógio fora do estado); modo duelo opcional
 hooks/useDuelRoom.js sala P2P: conexão, fases, juiz, revanche
 components/

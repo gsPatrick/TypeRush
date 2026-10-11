@@ -1,0 +1,46 @@
+.shell {
+  width: 100%;
+  max-width: calc(var(--column) + var(--gutter) * 2);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 var(--gutter) var(--space-12);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  height: 72px;
+}
+
+.home {
+  font-size: 1.125rem;
+  color: var(--color-bone);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-4);
+  margin-left: auto;
+}
+
+.nav a {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--color-bone);
+}
+
+.main {
+  padding-top: clamp(16px, 4vh, 48px);
+}
+
+@media (max-width: 480px) {
+  .nav { display: none; }
+  .header { justify-content: space-between; }
+}
