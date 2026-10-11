@@ -91,12 +91,12 @@ export default function MusicSearch({ onPick }) {
                 </span>
               </span>
               <span className={styles.meta}>
-                {(best[r.id] || best[`${r.id}:lives`]) ? (
-                  <span className={styles.played} title={`${m.best}: ${(best[r.id] || best[`${r.id}:lives`]).score}`}>
-                    <b className={styles[`r${(best[r.id] || best[`${r.id}:lives`]).rank}`]}>{(best[r.id] || best[`${r.id}:lives`]).rank}</b>
+                {(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]) ? (
+                  <span className={styles.played} title={`${m.best}: ${(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]).score}`}>
+                    <b className={styles[`r${(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]).rank}`]}>{(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]).rank}</b>
                     <span>
-                      {(best[r.id] || best[`${r.id}:lives`]).score} {m.score}
-                      <em>{(best[r.id] || best[`${r.id}:lives`]).completion}%</em>
+                      {(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]).score} {m.score}
+                      <em>{(best[r.id] || best[`${r.id}:lives`] || best[`${r.id}:easy`] || best[`${r.id}:lives:easy`]).completion}%</em>
                     </span>
                   </span>
                 ) : null}

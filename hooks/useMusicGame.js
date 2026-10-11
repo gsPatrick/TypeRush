@@ -22,8 +22,8 @@ import * as sfx from "@/lib/audio/sfx";
  */
 export const ON_FIRE_STREAK = 10;
 
-export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime, mode = "normal", onOffsetChange }) {
-  const lines = useMemo(() => buildLines(parseLrc(track.synced)), [track.synced]);
+export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime, mode = "normal", relaxed = false, onOffsetChange }) {
+  const lines = useMemo(() => buildLines(parseLrc(track.synced), { relaxed }), [track.synced, relaxed]);
   const engineRef = useRef(null);
   const [, bump] = useReducer((x) => x + 1, 0);
   const [status, setStatus] = useState("idle"); // idle | playing | over
@@ -98,7 +98,7 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
   );
 
   const start = useCallback(() => {
-    engineRef.current = createMusicEngine(lines, { mode });
+    engineRef.current = createMusicEngine(lines, { mode, relaxed });
     const first = lines[0]?.t ?? 0;
     silentStart.current = performance.now() - Math.max(0, first - 3) * 1000;
     lastAudio.current = 0;
@@ -106,7 +106,7 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
     setJuice(null);
     setStatus("playing");
     sfx.setSfxVolume(0.45);
-  }, [lines, mode]);
+  }, [lines, mode, relaxed]);
 
   /**
    * Ajusta o atraso no meio do jogo. Se o ajuste fizer a letra pular para a

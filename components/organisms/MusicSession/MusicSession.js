@@ -10,7 +10,15 @@ import LyricStage from "@/components/organisms/LyricStage/LyricStage";
 import MusicResults from "@/components/organisms/MusicResults/MusicResults";
 import useMusicGame from "@/hooks/useMusicGame";
 import { formatDuration } from "@/lib/music/lrc";
-import { getMusicMode, getOffset, pushRecent, setMusicMode, setOffset as saveOffset } from "@/lib/music/storage";
+import {
+  getMusicMode,
+  getOffset,
+  getRelaxed,
+  pushRecent,
+  setMusicMode,
+  setOffset as saveOffset,
+  setRelaxed as saveRelaxed,
+} from "@/lib/music/storage";
 import { parseYouTubeId } from "@/lib/music/youtube";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./MusicSession.module.css";
@@ -36,12 +44,14 @@ export default function MusicSession({ pick, onBack }) {
   const [linkError, setLinkError] = useState(false);
   const [changingVideo, setChangingVideo] = useState(false);
   const [mode, setMode] = useState("normal");
+  const [relaxed, setRelaxed] = useState(false);
   const playerRef = useRef(null);
 
   // letra + mídia em paralelo
   useEffect(() => {
     let alive = true;
     setMode(getMusicMode());
+    setRelaxed(getRelaxed());
     const q = new URLSearchParams({ artist: pick.artist, track: pick.track, duration: String(pick.duration), album: pick.album || "" });
     Promise.all([
       fetch(`/api/music/track?id=${pick.id}`).then(async (r) => (r.ok ? r.json() : Promise.reject(await r.json()))),
@@ -83,6 +93,7 @@ export default function MusicSession({ pick, onBack }) {
     hasAudio,
     getAudioTime: () => playerRef.current?.time() ?? null,
     mode,
+    relaxed,
     onOffsetChange: persistOffset,
   });
 
@@ -296,6 +307,22 @@ export default function MusicSession({ pick, onBack }) {
                     </button>
                   ))}
                 </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={relaxed}
+                  className={styles.relaxed}
+                  onClick={() => {
+                    setRelaxed(!relaxed);
+                    saveRelaxed(!relaxed);
+                  }}
+                >
+                  <span className={`${styles.track} ${relaxed ? styles.trackOn : ""}`}>
+                    <span />
+                  </span>
+                  <b>{m.relaxed}</b>
+                  <span className={styles.relaxedHint}>{m.relaxedHint}</span>
+                </button>
               </div>
 
               {hasAudio ? (
@@ -347,20 +374,17 @@ export default function MusicSession({ pick, onBack }) {
               media={media}
               hasAudio={hasAudio}
               mode={mode}
+              relaxed={relaxed}
               onAgain={start}
               onAnother={onBack}
             />
           ) : null}
 
-          <p className={styles.credits}>
-            {phase === "playing" ? (
-              <>
-                <Kbd>esc</Kbd> {m.quit} ·{" "}
-              </>
-            ) : null}
-            {m.lyricsCredit}
-            {hasAudio ? ` · ${m.audioCredit}` : ""}
-          </p>
+          {phase === "playing" ? (
+            <p className={styles.credits}>
+              <Kbd>esc</Kbd> {m.quit}
+            </p>
+          ) : null}
         </section>
       </div>
     </div>
