@@ -1,15 +1,18 @@
+/* mesma coluna do resto do site (1040) e duas colunas no desktop */
 .shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
   width: 100%;
-  max-width: calc(720px + var(--gutter) * 2);
+  max-width: calc(var(--column) + var(--gutter) * 2);
   min-height: 100dvh;
   margin: 0 auto;
-  padding: 0 var(--gutter) var(--space-16);
+  padding: 0 var(--gutter);
 }
 
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-6);
   height: 72px;
 }
 
@@ -19,17 +22,35 @@
   text-decoration: none;
 }
 
+.modes {
+  margin-right: auto;
+}
+
 .main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-content: center;
+  padding: var(--space-6) 0 var(--space-8);
+}
+
+@media (min-width: 960px) {
+  .main {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-16);
+    align-items: center;
+  }
+}
+
+.intro {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  padding-top: clamp(24px, 6vh, 64px);
+  gap: var(--space-4);
 }
 
 .kicker,
 .label {
   display: block;
-  margin-bottom: var(--space-3);
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   letter-spacing: var(--tracking-label);
@@ -40,20 +61,40 @@
 .h1 {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: clamp(2.75rem, 1.8rem + 4vw, 4.5rem);
+  font-size: clamp(2.75rem, 1.8rem + 4vw, 5rem);
   line-height: 1;
   letter-spacing: -0.045em;
   color: var(--color-bone);
 }
 
 .lede {
-  max-width: 44ch;
-  margin-top: var(--space-4);
+  max-width: 40ch;
+  font-size: 1.0625rem;
   color: var(--color-ash);
 }
 
-.field {
-  display: block;
+.note {
+  max-width: 44ch;
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1.6;
+  color: var(--color-slate);
+}
+
+/* formulário: tudo na largura do painel (mesmas bordas) */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.field,
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .input {
@@ -74,19 +115,38 @@
   border-color: var(--color-lime);
 }
 
-.block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+.full {
+  width: 100%;
 }
 
-.row {
+/* "ou entre numa sala" com traços dos dois lados */
+.divider {
   display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-slate);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-hairline);
 }
 
 .joinRow {
   display: flex;
   gap: var(--space-3);
+}
+
+.joinRow button {
+  height: 52px;
 }
 
 .code {
@@ -110,9 +170,7 @@
   color: var(--color-bone);
 }
 
-.note {
-  font-family: var(--font-mono);
-  font-size: var(--text-micro);
-  line-height: 1.6;
-  color: var(--color-slate);
+@media (max-width: 560px) {
+  .modes { display: none; }
+  .header { justify-content: space-between; }
 }

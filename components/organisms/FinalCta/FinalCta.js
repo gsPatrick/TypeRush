@@ -15,7 +15,7 @@ export default function FinalCta() {
         <h2 className={styles.h2}>Sua vez.</h2>
         <p className={styles.lede}>Sem cadastro, sem download. O relógio começa na primeira tecla.</p>
         <div className={styles.actions}>
-          <Button href="/play" size="lg">
+          <Button href="/jogar" size="lg">
             Começar a partida <span aria-hidden="true">→</span>
           </Button>
           <EnterToPlay listen={false} />

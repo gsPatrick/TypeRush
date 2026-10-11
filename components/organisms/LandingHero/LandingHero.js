@@ -27,7 +27,7 @@ export default function LandingHero() {
             Trinta segundos no relógio. Cada palavra certa devolve um. Cada erro tira dois. Até onde você chega?
           </p>
           <div className={styles.actions}>
-            <Button href="/play" size="lg">
+            <Button href="/jogar" size="lg">
               Jogar agora <span aria-hidden="true">→</span>
             </Button>
             <EnterToPlay />

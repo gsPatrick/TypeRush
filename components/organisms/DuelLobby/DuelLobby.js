@@ -33,31 +33,35 @@ export default function DuelLobby({ room, code, name }) {
 
   return (
     <section className={styles.root}>
-      <div className={styles.invite}>
-        <span className={styles.label}>{d.code}</span>
-        <span className={styles.bigCode}>{code}</span>
-        <div className={styles.inviteRow}>
-          <Button variant="ghost" onClick={copy}>
-            {copied ? d.copied : d.copyLink}
-          </Button>
-          <span className={styles.hint}>{d.shareHint}</span>
-        </div>
-      </div>
-
-      <div className={styles.players}>
-        <Player name={name} tag={host ? d.host : d.you} ready={host || room.meReady} you t={d} />
-        <span className={styles.vs}>vs</span>
-        {room.rival ? (
-          <Player name={room.rival.name} tag={host ? "" : d.host} ready={!host || room.rival.ready} t={d} />
-        ) : (
-          <div className={`${styles.player} ${styles.empty}`}>
-            <span className={styles.pulse} />
-            <span>{room.conn === "connecting" ? d.connecting : d.waiting}</span>
+      <div className={styles.left}>
+        <div className={styles.invite}>
+          <span className={styles.label}>{d.code}</span>
+          <span className={styles.bigCode}>{code}</span>
+          <div className={styles.inviteRow}>
+            <Button variant="ghost" onClick={copy}>
+              {copied ? d.copied : d.copyLink}
+            </Button>
+            <span className={styles.hint}>{d.shareHint}</span>
           </div>
-        )}
+        </div>
+
+        <div className={styles.players}>
+          <Player name={name} tag={host ? d.host : d.you} ready={host || room.meReady} you t={d} />
+          <span className={styles.vs}>vs</span>
+          {room.rival ? (
+            <Player name={room.rival.name} tag={host ? "" : d.host} ready={!host || room.rival.ready} t={d} />
+          ) : (
+            <div className={`${styles.player} ${styles.empty}`}>
+              <span className={styles.pulse} />
+              <span>{room.conn === "connecting" ? d.connecting : d.waiting}</span>
+            </div>
+          )}
+        </div>
+
+        {room.slow && !room.rival ? <p className={styles.slow}>{host ? d.slowHost : d.slowGuest}</p> : null}
       </div>
 
-      <div className={styles.config}>
+      <div className={styles.right}>
         <div className={styles.configHead}>
           <span className={styles.label}>{d.mode}</span>
           {host ? (
@@ -67,22 +71,24 @@ export default function DuelLobby({ room, code, name }) {
           )}
         </div>
         <ModePicker value={room.settings.mode} onChange={(m) => room.changeSettings({ mode: m })} disabled={!host} />
-      </div>
 
-      <div className={styles.actions}>
         {host ? (
-          <Button size="lg" onClick={room.startRound} disabled={!room.canStart}>
+          <Button size="lg" onClick={room.startRound} disabled={!room.canStart} className={styles.full}>
             {d.start} <span aria-hidden="true">→</span>
           </Button>
         ) : (
-          <Button size="lg" variant={room.meReady ? "ghost" : "primary"} onClick={room.toggleReady} disabled={!room.rival}>
+          <Button
+            size="lg"
+            variant={room.meReady ? "ghost" : "primary"}
+            onClick={room.toggleReady}
+            disabled={!room.rival}
+            className={styles.full}
+          >
             {room.meReady ? d.unready : d.imReady}
           </Button>
         )}
         {status ? <span className={styles.status}>{status}</span> : null}
       </div>
-
-      {room.slow && !room.rival ? <p className={styles.slow}>{host ? d.slowHost : d.slowGuest}</p> : null}
     </section>
   );
 }

@@ -11,7 +11,7 @@ export default function LandingFooter() {
         <nav className={styles.links} aria-label="Rodapé">
           <a href="#como-funciona">como funciona</a>
           <a href="#mecanicas">mecânicas</a>
-          <Link href="/play">solo</Link>
+          <Link href="/rush">solo</Link>
           <Link href="/duel">duelo</Link>
           <Link href="/music">música</Link>
         </nav>

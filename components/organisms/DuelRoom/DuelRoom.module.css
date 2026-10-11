@@ -100,7 +100,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(16px, 4vh, 56px) 0;
+  padding: clamp(16px, 3vh, 40px) 0;
 }
 
 .notice {
@@ -122,4 +122,8 @@
   .stage { align-items: flex-start; }
   /* placar só com os números (lime = você, lavanda = adversário) */
   .me, .rivalName { display: none; }
+}
+
+@media (max-width: 960px) {
+  .modes { display: none; }
 }

@@ -39,7 +39,7 @@ export default function LandingNav() {
               {l.label}
             </a>
           ))}
-          <Link href="/play" className={styles.cta}>
+          <Link href="/jogar" className={styles.cta}>
             Jogar
           </Link>
         </nav>

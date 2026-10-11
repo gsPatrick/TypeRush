@@ -3,6 +3,7 @@
 import Link from "next/link";
 import BrandMark from "@/components/atoms/BrandMark/BrandMark";
 import Button from "@/components/atoms/Button/Button";
+import ModeNav from "@/components/molecules/ModeNav/ModeNav";
 import DuelLobby from "@/components/organisms/DuelLobby/DuelLobby";
 import DuelPlay from "@/components/organisms/DuelPlay/DuelPlay";
 import useDuelRoom from "@/hooks/useDuelRoom";
@@ -35,6 +36,7 @@ function RoomView({ room, code, name, onLeave }) {
         <Link href="/" className={styles.home} aria-label="TypeRush">
           <BrandMark />
         </Link>
+        <ModeNav current="duel" lang={lang} className={styles.modes} />
 
         <div className={styles.meta}>
           <span className={styles.code}>

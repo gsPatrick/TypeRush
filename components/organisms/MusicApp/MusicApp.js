@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/atoms/BrandMark/BrandMark";
 import LanguageSwitch from "@/components/molecules/LanguageSwitch/LanguageSwitch";
+import ModeNav from "@/components/molecules/ModeNav/ModeNav";
 import MusicSearch from "@/components/organisms/MusicSearch/MusicSearch";
 import MusicSession from "@/components/organisms/MusicSession/MusicSession";
 import { LocaleProvider } from "@/lib/i18n/LocaleContext";
@@ -32,10 +33,7 @@ export default function MusicApp() {
           <Link href="/" className={styles.home} aria-label="TypeRush">
             <BrandMark />
           </Link>
-          <nav className={styles.nav}>
-            <Link href="/play">solo</Link>
-            <Link href="/duel">duelo</Link>
-          </nav>
+          <ModeNav current="music" lang={lang} className={styles.nav} />
           <LanguageSwitch value={lang} onChange={changeLang} />
         </header>
         <main className={styles.main}>

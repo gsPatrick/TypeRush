@@ -80,3 +80,15 @@
 @media (max-width: 640px) {
   .duel { display: none; }
 }
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+/* celular: o header do solo não tem largura para a troca de modo */
+@media (max-width: 720px) {
+  .modes { display: none; }
+}

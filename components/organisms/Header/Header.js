@@ -2,6 +2,7 @@ import Link from "next/link";
 import BrandMark from "@/components/atoms/BrandMark/BrandMark";
 import ComboToggle from "@/components/molecules/ComboToggle/ComboToggle";
 import LanguageSwitch from "@/components/molecules/LanguageSwitch/LanguageSwitch";
+import ModeNav from "@/components/molecules/ModeNav/ModeNav";
 import SoundToggle from "@/components/molecules/SoundToggle/SoundToggle";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./Header.module.css";
@@ -10,16 +11,13 @@ export default function Header({ combo, onToggleCombo, lang, onChangeLanguage, s
   const { t } = useLocale();
   return (
     <header className={`${styles.root} ${running ? styles.dim : ""}`}>
-      <Link href="/" className={styles.home} aria-label="TypeRush — início">
-        <BrandMark className={styles.brand} />
-      </Link>
+      <div className={styles.left}>
+        <Link href="/" className={styles.home} aria-label="TypeRush — início">
+          <BrandMark className={styles.brand} />
+        </Link>
+        <ModeNav current="solo" lang={lang} className={styles.modes} />
+      </div>
       <div className={styles.right}>
-        <Link href="/music" className={styles.duel}>
-          {t.music.nav}
-        </Link>
-        <Link href="/duel" className={styles.duel}>
-          {t.duel.nav}
-        </Link>
         <LanguageSwitch value={lang} onChange={onChangeLanguage} disabled={running} />
         <ComboToggle enabled={combo} onToggle={onToggleCombo} disabled={running} />
         <SoundToggle enabled={sound} onToggle={onToggleSound} />

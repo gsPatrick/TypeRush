@@ -6,13 +6,14 @@ opcional: **+2s a cada 10 acertos seguidos**.
 
 ```bash
 npm install
-npm run dev     # http://localhost:3017  (landing) · /play (jogo)
+npm run dev     # http://localhost:3017  (landing) · /jogar (escolha de modo)
 ```
 
 | Rota | O quê |
 |---|---|
 | `/` | landing — o jogo se jogando sozinho no herói, regras "digitadas" pelo scroll |
-| `/play` | o jogo |
+| `/jogar` | escolha de modo (todo "Jogar" da landing vem pra cá; teclas 1 · 2 · 3) |
+| `/rush` | o modo principal — sobrevivência solo (`/play` redireciona para cá) |
 | `/duel` | duelo online 1×1 — sala com código/link, P2P |
 | `/music` | modo música — digite a letra no tempo do cantor |
 

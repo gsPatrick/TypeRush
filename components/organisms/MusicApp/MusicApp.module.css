@@ -20,20 +20,7 @@
 }
 
 .nav {
-  display: flex;
-  gap: var(--space-4);
-  margin-left: auto;
-}
-
-.nav a {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--color-ash);
-  text-decoration: none;
-}
-
-.nav a:hover {
-  color: var(--color-bone);
+  margin-right: auto;
 }
 
 .main {

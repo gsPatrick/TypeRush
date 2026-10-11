@@ -1,0 +1,34 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-slate);
+  text-decoration: none;
+  border-radius: var(--radius-pill);
+  transition: color var(--duration-base) var(--ease-out-expo), background-color var(--duration-base);
+}
+
+a.item:hover {
+  color: var(--color-bone);
+}
+
+.on {
+  color: var(--color-bone);
+  background: var(--color-surface-raised);
+}
+
+@media (max-width: 420px) {
+  .item { padding: 0 var(--space-2); font-size: var(--text-micro); }
+}
