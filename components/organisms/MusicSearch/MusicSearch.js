@@ -99,9 +99,7 @@ export default function MusicSearch({ onPick }) {
                       <em>{(best[r.id] || best[`${r.id}:lives`]).completion}%</em>
                     </span>
                   </span>
-                ) : (
-                  <span className={styles.badge}>{m.synced}</span>
-                )}
+                ) : null}
                 <span className={styles.dur}>{formatDuration(r.duration)}</span>
               </span>
             </button>
