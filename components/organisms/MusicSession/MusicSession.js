@@ -33,6 +33,7 @@ export default function MusicSession({ pick, onBack }) {
   const [audioHint, setAudioHint] = useState(null);
   const [link, setLink] = useState("");
   const [linkError, setLinkError] = useState(false);
+  const [changingVideo, setChangingVideo] = useState(false);
   const playerRef = useRef(null);
 
   // letra + mídia em paralelo
@@ -70,7 +71,7 @@ export default function MusicSession({ pick, onBack }) {
 
   const start = useCallback(() => {
     if (!track) return;
-    pushRecent(pick);
+    pushRecent({ ...pick, cover: pick.cover ?? media?.cover ?? null });
     setAudioHint(null);
     if (hasAudio) {
       playerRef.current?.restart();
@@ -81,7 +82,7 @@ export default function MusicSession({ pick, onBack }) {
     }
     game.start();
     setPhase("playing");
-  }, [track, pick, hasAudio, game, m]);
+  }, [track, pick, media, hasAudio, game, m]);
 
   // fim do jogo → resultado (a música segue tocando o final)
   useEffect(() => {
@@ -127,6 +128,7 @@ export default function MusicSession({ pick, onBack }) {
     setSilent(false);
     setQuality("link");
     setVideoId(id);
+    setChangingVideo(false);
   };
 
   const nudge = (delta) => {
@@ -147,6 +149,7 @@ export default function MusicSession({ pick, onBack }) {
   }
 
   const info = track ?? pick;
+  const showLinkForm = !videoId || silent || changingVideo;
 
   return (
     <div className={`${styles.root} ${styles[phase]}`}>
@@ -166,114 +169,125 @@ export default function MusicSession({ pick, onBack }) {
         )}
       </div>
 
-      <div className={styles.trackbar}>
-        {media?.cover ? <img className={styles.thumb} src={media.cover} alt="" width={56} height={56} /> : null}
-        <div className={styles.titles}>
-          <b>{info.track}</b>
-          <span>
-            {info.artist}
-            {info.album ? <em> · {info.album}</em> : null}
-          </span>
-        </div>
-        <SpotifyButton href={media?.spotify} label={m.listen} />
-      </div>
-
-      <section className={styles.main}>
-        {phase === "loading" ? <p className={styles.msg}>{m.loading}</p> : null}
-
-        {phase === "ready" ? (
-          <div className={styles.ready}>
-            <div className={styles.audio}>
-              <span className={styles.label}>{m.audio}</span>
-              {videoId && !silent ? (
-                <p className={`${styles.quality} ${styles[quality] || ""}`}>
-                  {m.withAudio}
-                  {quality && quality !== "link" ? ` · ${m.quality[quality]}` : ""}
-                </p>
-              ) : (
-                <>
-                  <p className={styles.msg}>{media?.videoReason === "no-key" ? m.noKey : m.notFound}</p>
-                  <p className={styles.hint}>{m.pasteHint}</p>
-                </>
-              )}
-              <form
-                className={styles.linkRow}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  applyLink();
-                }}
-              >
-                <input
-                  className={styles.linkInput}
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder={m.pastePlaceholder}
-                  aria-label={m.pastePlaceholder}
-                />
-                <Button variant="ghost" type="submit">
-                  {m.useLink}
-                </Button>
-              </form>
-              {linkError ? <p className={styles.err}>{m.badLink}</p> : null}
-            </div>
-
-            {hasAudio ? (
-              <div className={styles.offset}>
-                <span className={styles.label}>{m.offset}</span>
-                <div className={styles.offsetRow}>
-                  <button type="button" onClick={() => nudge(-0.1)}>− {m.earlier}</button>
-                  <b>{m.offsetHint(offset)}</b>
-                  <button type="button" onClick={() => nudge(0.1)}>{m.later} +</button>
-                </div>
-              </div>
-            ) : null}
-
-            <div className={styles.actions}>
-              <Button size="lg" onClick={start}>
-                {m.start} <span aria-hidden="true">→</span>
-              </Button>
-              {!videoId || silent ? null : (
-                <button type="button" className={styles.silentBtn} onClick={() => setSilent(true)}>
-                  {m.silent}
-                </button>
-              )}
-              <span className={styles.keys}>
-                {m.or} <Kbd>enter</Kbd>
-              </span>
-            </div>
-
-            <button type="button" className={styles.back} onClick={onBack}>
-              ← {m.back} · {formatDuration(info.duration)}
-            </button>
+      <div className={styles.panel}>
+        <div className={styles.trackbar}>
+          {media?.cover ? <img className={styles.thumb} src={media.cover} alt="" width={56} height={56} /> : null}
+          <div className={styles.titles}>
+            <b>{info.track}</b>
+            <span>
+              {info.artist}
+              {info.album ? <em> · {info.album}</em> : null}
+            </span>
           </div>
-        ) : null}
+          <SpotifyButton href={media?.spotify} label={m.listen} />
+        </div>
 
+        <section className={styles.main}>
+          {phase === "loading" ? <p className={styles.msg}>{m.loading}</p> : null}
 
-        {phase === "playing" ? (
-          <>
-            <LyricStage game={game} duration={info.duration} />
-            {audioHint ? <p className={styles.hint}>{audioHint}</p> : null}
-            <p className={styles.escHint}>
-              <Kbd>esc</Kbd> {m.quit}
-            </p>
-          </>
-        ) : null}
+          {phase === "ready" ? (
+            <div className={styles.readyBox}>
+              <div className={styles.audio}>
+                <span className={styles.label}>{m.audio}</span>
+                {videoId && !silent ? (
+                  <p className={`${styles.quality} ${styles[quality] || ""}`}>
+                    {m.withAudio}
+                    {quality && quality !== "link" ? ` · ${m.quality[quality]}` : ""}
+                    {!changingVideo ? (
+                      <button type="button" className={styles.inlineBtn} onClick={() => setChangingVideo(true)}>
+                        {m.changeVideo}
+                      </button>
+                    ) : null}
+                  </p>
+                ) : (
+                  <>
+                    <p className={styles.msg}>{media?.videoReason === "no-key" ? m.noKey : m.notFound}</p>
+                    <p className={styles.hint}>{m.pasteHint}</p>
+                  </>
+                )}
+                {showLinkForm ? (
+                  <form
+                    className={styles.linkRow}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      applyLink();
+                    }}
+                  >
+                    <input
+                      className={styles.linkInput}
+                      value={link}
+                      onChange={(e) => setLink(e.target.value)}
+                      placeholder={m.pastePlaceholder}
+                      aria-label={m.pastePlaceholder}
+                    />
+                    <Button variant="ghost" type="submit">
+                      {m.useLink}
+                    </Button>
+                  </form>
+                ) : null}
+                {linkError ? <p className={styles.err}>{m.badLink}</p> : null}
+              </div>
 
-        {phase === "results" && game.outcome ? (
-          <MusicResults
-            outcome={game.outcome}
-            track={info}
-            media={media}
-            hasAudio={hasAudio}
-            onAgain={start}
-            onAnother={onBack}
-          />
-        ) : null}
-        <p className={styles.credits}>
-          {m.lyricsCredit}
-          {hasAudio ? ` · ${m.audioCredit}` : ""}
-        </p>
-      </section>
+              {hasAudio ? (
+                <div className={styles.offset}>
+                  <span className={styles.label}>{m.offset}</span>
+                  <div className={styles.offsetRow}>
+                    <button type="button" onClick={() => nudge(-0.1)}>− {m.earlier}</button>
+                    <b>{m.offsetHint(offset)}</b>
+                    <button type="button" onClick={() => nudge(0.1)}>{m.later} +</button>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className={styles.actions}>
+                <Button size="lg" onClick={start}>
+                  {m.start} <span aria-hidden="true">→</span>
+                </Button>
+                {!videoId || silent ? null : (
+                  <button type="button" className={styles.silentBtn} onClick={() => setSilent(true)}>
+                    {m.silent}
+                  </button>
+                )}
+                <span className={styles.keys}>
+                  {m.or} <Kbd>enter</Kbd>
+                </span>
+              </div>
+
+              <button type="button" className={styles.back} onClick={onBack}>
+                ← {m.back} · {formatDuration(info.duration)}
+              </button>
+            </div>
+          ) : null}
+
+          {phase === "playing" ? (
+            <>
+              <LyricStage game={game} duration={info.duration} />
+              {audioHint ? <p className={styles.hint}>{audioHint}</p> : null}
+            </>
+          ) : null}
+
+          {phase === "results" && game.outcome ? (
+            <MusicResults
+              outcome={game.outcome}
+              track={info}
+              media={media}
+              hasAudio={hasAudio}
+              onAgain={start}
+              onAnother={onBack}
+            />
+          ) : null}
+
+          <p className={styles.credits}>
+            {phase === "playing" ? (
+              <>
+                <Kbd>esc</Kbd> {m.quit} ·{" "}
+              </>
+            ) : null}
+            {m.lyricsCredit}
+            {hasAudio ? ` · ${m.audioCredit}` : ""}
+          </p>
+        </section>
+      </div>
     </div>
   );
 }

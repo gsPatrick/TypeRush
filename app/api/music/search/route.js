@@ -1,4 +1,5 @@
 import { searchTracks } from "@/lib/music/server/lrclib";
+import { attachCovers } from "@/lib/music/server/credits";
 
 export const dynamic = "force-dynamic";
 
@@ -6,7 +7,7 @@ export async function GET(request) {
   const q = new URL(request.url).searchParams.get("q")?.trim() || "";
   if (q.length < 2) return Response.json({ results: [] });
   try {
-    const results = await searchTracks(q.slice(0, 100));
+    const results = await attachCovers(await searchTracks(q.slice(0, 100)));
     return Response.json(
       { results },
       { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } }

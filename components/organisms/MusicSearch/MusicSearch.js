@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatDuration } from "@/lib/music/lrc";
-import { getRecent } from "@/lib/music/storage";
+import { getAllBest, getRecent } from "@/lib/music/storage";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./MusicSearch.module.css";
 
@@ -13,10 +13,12 @@ export default function MusicSearch({ onPick }) {
   const [q, setQ] = useState("");
   const [state, setState] = useState({ status: "idle", results: [] });
   const [recent, setRecent] = useState([]);
+  const [best, setBest] = useState({});
   const inputRef = useRef(null);
 
   useEffect(() => {
     setRecent(getRecent());
+    setBest(getAllBest());
     inputRef.current?.focus();
   }, []);
 
@@ -78,6 +80,9 @@ export default function MusicSearch({ onPick }) {
         {list.map((r) => (
           <li key={r.id}>
             <button type="button" className={styles.item} onClick={() => onPick(r)}>
+              <span className={styles.cover}>
+                {r.cover ? <img src={r.cover} alt="" width={52} height={52} loading="lazy" /> : <span aria-hidden="true">♪</span>}
+              </span>
               <span className={styles.titles}>
                 <b>{r.track}</b>
                 <span>
@@ -86,7 +91,17 @@ export default function MusicSearch({ onPick }) {
                 </span>
               </span>
               <span className={styles.meta}>
-                <span className={styles.badge}>{m.synced}</span>
+                {best[r.id] ? (
+                  <span className={styles.played} title={`${m.best}: ${best[r.id].score}`}>
+                    <b className={styles[`r${best[r.id].rank}`]}>{best[r.id].rank}</b>
+                    <span>
+                      {best[r.id].score} {m.score}
+                      <em>{best[r.id].completion}%</em>
+                    </span>
+                  </span>
+                ) : (
+                  <span className={styles.badge}>{m.synced}</span>
+                )}
                 <span className={styles.dur}>{formatDuration(r.duration)}</span>
               </span>
             </button>

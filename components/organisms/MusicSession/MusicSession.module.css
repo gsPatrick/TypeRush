@@ -1,9 +1,46 @@
+/*
+ * Sem rolagem no desktop: tudo é dimensionado pela ALTURA da janela.
+ *   preparo/resultado → 2 colunas: palco (vídeo) | painel (controles)
+ *   jogando           → 1 coluna: vídeo · faixa · letra
+ * Celular: empilha (rolar no preparo é aceitável; o jogo cabe).
+ */
 .root {
+  /* janela − header (72) − respiro do topo (≤24) − respiro do rodapé (24) */
+  --avail: calc(100dvh - 72px - 56px);
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.panel {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-6);
+  gap: var(--space-4);
+  width: min(100%, 860px);
+  min-width: 0;
+}
+
+@media (min-width: 960px) {
+  .ready,
+  .results,
+  .loading {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: center;
+    min-height: var(--avail);
+    gap: var(--space-12);
+  }
+  .ready .panel,
+  .results .panel,
+  .loading .panel {
+    width: 100%;
+  }
+  .ready .stage,
+  .results .stage,
+  .loading .stage {
+    align-self: center;
+  }
 }
 
 /* capa desfocada: dá a cor da música sem competir com a letra */
@@ -39,19 +76,15 @@
 }
 
 .video {
-  width: min(100%, 960px, calc(46vh * 16 / 9));
+  /* largura derivada da altura disponível: o vídeo nunca empurra o resto */
+  width: min(100%, calc(var(--avail) * 0.62 * 16 / 9));
   border-radius: var(--radius-lg);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--color-hairline);
 }
 
-/* jogando, tudo precisa caber numa tela: senão o navegador rola até o
-   campo de digitação e o vídeo sai de vista */
-.playing {
-  gap: var(--space-4);
-}
-
+/* jogando: vídeo · faixa · letra precisam caber juntos */
 .playing .video {
-  width: min(100%, 860px, calc(33vh * 16 / 9));
+  width: min(100%, 860px, calc(max(200px, var(--avail) * 0.3) * 16 / 9));
 }
 
 .art {
@@ -87,7 +120,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  width: min(100%, 860px);
+  width: 100%;
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-pill);
@@ -134,11 +167,20 @@
 }
 
 .credits {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 var(--space-2);
   font-family: var(--font-mono);
   font-size: var(--text-micro);
-  line-height: 1.6;
-  text-align: center;
+  line-height: 1.8;
   color: var(--color-slate);
+}
+
+.ready .credits,
+.results .credits {
+  justify-content: flex-start;
 }
 
 @media (max-width: 560px) {
@@ -147,6 +189,11 @@
     border-radius: var(--radius-lg);
   }
   .trackbar > a { width: 100%; justify-content: center; }
+  /* jogando no celular: Spotify fica, mas compacto, para a letra caber */
+  .playing .trackbar { flex-wrap: nowrap; padding: var(--space-2) var(--space-3); }
+  .playing .trackbar > a { width: auto; }
+  .playing .trackbar > a span { display: none; }
+  .playing .thumb { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,8 +203,8 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  width: min(100%, 860px);
+  gap: var(--space-4);
+  width: 100%;
   min-width: 0;
 }
 
@@ -172,10 +219,35 @@
 .hint { font-size: var(--text-sm); color: var(--color-slate); }
 .err { font-size: var(--text-sm); color: var(--color-red); }
 
-.ready {
+/* caixa de controles do preparo — nome próprio: `.ready` é o modificador
+   de fase da raiz, e reaproveitar o nome aplicava o grid de 2 colunas aqui */
+.readyBox {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-6);
+}
+
+/* no painel lateral a faixa vira cartão (a pílula não cabe) */
+@media (min-width: 960px) {
+  .ready .trackbar,
+  .results .trackbar,
+  .loading .trackbar {
+    flex-wrap: wrap;
+    border-radius: var(--radius-lg);
+  }
+}
+
+.inlineBtn {
+  margin-left: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-slate);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inlineBtn:hover {
+  color: var(--color-bone);
 }
 
 .label {
