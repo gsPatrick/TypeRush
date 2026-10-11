@@ -321,11 +321,13 @@ export default function MusicSession({ pick, onBack }) {
                     saveRelaxed(!relaxed);
                   }}
                 >
+                  <span className={styles.relaxedText}>
+                    <b>{m.relaxed}</b>
+                    <span className={styles.relaxedHint}>{m.relaxedHint}</span>
+                  </span>
                   <span className={`${styles.track} ${relaxed ? styles.trackOn : ""}`}>
                     <span />
                   </span>
-                  <b>{m.relaxed}</b>
-                  <span className={styles.relaxedHint}>{m.relaxedHint}</span>
                 </button>
               </div>
 

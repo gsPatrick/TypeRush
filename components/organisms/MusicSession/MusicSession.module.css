@@ -657,3 +657,37 @@
   justify-content: space-between;
   gap: var(--space-4);
 }
+
+/* largura toda, como o resto do painel (mesmas bordas) */
+.status {
+  align-self: stretch;
+  justify-content: center;
+  width: 100%;
+}
+
+.relaxed {
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  background: rgba(18, 20, 18, 0.6);
+  transition: border-color var(--duration-base) var(--ease-out-expo);
+}
+
+.relaxed:hover {
+  border-color: var(--color-slate);
+}
+
+.relaxed[aria-checked="true"] {
+  border-color: rgba(206, 247, 158, 0.45);
+}
+
+.relaxedText {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 var(--space-3);
+  min-width: 0;
+}
