@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "@/components/atoms/Button/Button";
 import Kbd from "@/components/atoms/Kbd/Kbd";
 import SpotifyButton from "@/components/atoms/SpotifyButton/SpotifyButton";
+import YouTubeSearchButton from "@/components/atoms/YouTubeSearchButton/YouTubeSearchButton";
 import YouTubePlayer from "@/components/molecules/YouTubePlayer/YouTubePlayer";
 import LyricStage from "@/components/organisms/LyricStage/LyricStage";
 import MusicResults from "@/components/organisms/MusicResults/MusicResults";
@@ -142,8 +143,8 @@ export default function MusicSession({ pick, onBack }) {
     [quality, track]
   );
 
-  const applyLink = () => {
-    const id = parseYouTubeId(link);
+  const applyLink = (value = link) => {
+    const id = parseYouTubeId(value);
     if (!id) {
       setLinkError(true);
       return;
@@ -230,13 +231,18 @@ export default function MusicSession({ pick, onBack }) {
                     ) : null}
                   </p>
                 ) : (
-                  <>
-                    <p className={styles.msg}>{media?.videoReason === "no-key" ? m.noKey : m.notFound}</p>
-                    <p className={styles.hint}>{m.pasteHint}</p>
-                  </>
+                  <ol className={styles.steps}>
+                    {m.ytSteps.map((step, i) => (
+                      <li key={i}>
+                        <b>{i + 1}</b> {step}
+                      </li>
+                    ))}
+                  </ol>
                 )}
                 {showLinkForm ? (
-                  <form
+                  <div className={styles.ytRow}>
+                    <YouTubeSearchButton artist={info.artist} track={info.track} label={m.ytSearch} />
+                    <form
                     className={styles.linkRow}
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -246,7 +252,19 @@ export default function MusicSession({ pick, onBack }) {
                     <input
                       className={styles.linkInput}
                       value={link}
-                      onChange={(e) => setLink(e.target.value)}
+                      onChange={(e) => {
+                        setLink(e.target.value);
+                        setLinkError(false);
+                      }}
+                      onPaste={(e) => {
+                        // colou um link válido: aplica na hora, sem clicar em "Usar"
+                        const pasted = e.clipboardData.getData("text");
+                        if (parseYouTubeId(pasted)) {
+                          e.preventDefault();
+                          setLink(pasted);
+                          applyLink(pasted);
+                        }
+                      }}
                       placeholder={m.pastePlaceholder}
                       aria-label={m.pastePlaceholder}
                     />
@@ -254,8 +272,11 @@ export default function MusicSession({ pick, onBack }) {
                       {m.useLink}
                     </Button>
                   </form>
+                  </div>
                 ) : null}
+
                 {linkError ? <p className={styles.err}>{m.badLink}</p> : null}
+                {showLinkForm ? <p className={styles.hint}>{m.ytTip}</p> : null}
               </div>
 
               <div className={styles.modeBox}>

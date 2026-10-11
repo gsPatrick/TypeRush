@@ -232,7 +232,6 @@
   .ready .trackbar,
   .results .trackbar,
   .loading .trackbar {
-    flex-wrap: wrap;
     border-radius: var(--radius-lg);
   }
 }
@@ -444,4 +443,41 @@
 .playing .panel,
 .playing .main {
   gap: 12px;
+}
+
+/* sem chave da API: o caminho é buscar no YouTube e colar o link */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--space-4);
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+}
+
+.steps b {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: var(--space-2);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-micro);
+  color: var(--color-bone);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 50%;
+}
+
+.ytRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.ytRow .linkRow {
+  flex: 1;
+  min-width: 220px;
+  margin-top: 0;
 }
