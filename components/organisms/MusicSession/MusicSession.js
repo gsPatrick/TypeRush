@@ -218,7 +218,8 @@ export default function MusicSession({ pick, onBack }) {
             <b>{info.track}</b>
             <span>
               {info.artist}
-              {info.album ? <em> · {info.album}</em> : null}
+              {/* álbum homônimo ("Nirvana · Nirvana") só repete — esconde */}
+              {info.album && info.album.toLowerCase() !== info.artist.toLowerCase() ? <em> · {info.album}</em> : null}
             </span>
           </div>
           <SpotifyButton href={media?.spotify} label={m.listen} />
@@ -230,16 +231,19 @@ export default function MusicSession({ pick, onBack }) {
           {phase === "ready" ? (
             <div className={styles.readyBox}>
               <div className={styles.audio}>
-                <span className={styles.label}>{m.audio}</span>
+                <div className={styles.sectionHead}>
+                  <span className={styles.label}>{m.audio}</span>
+                  {videoId && !silent && !changingVideo ? (
+                    <button type="button" className={styles.inlineBtn} onClick={() => setChangingVideo(true)}>
+                      {m.changeVideo}
+                    </button>
+                  ) : null}
+                </div>
                 {videoId && !silent ? (
-                  <p className={`${styles.quality} ${styles[quality] || ""}`}>
-                    {m.withAudio}
-                    {quality && quality !== "link" ? ` · ${m.quality[quality]}` : ""}
-                    {!changingVideo ? (
-                      <button type="button" className={styles.inlineBtn} onClick={() => setChangingVideo(true)}>
-                        {m.changeVideo}
-                      </button>
-                    ) : null}
+                  <p className={`${styles.status} ${styles[quality] || ""}`}>
+                    <i aria-hidden="true" />
+                    {m.audioYoutube}
+                    {quality && quality !== "link" ? <span> · {m.quality[quality]}</span> : null}
                   </p>
                 ) : (
                   <ol className={styles.steps}>
@@ -328,27 +332,27 @@ export default function MusicSession({ pick, onBack }) {
               {hasAudio ? (
                 <div className={styles.offset}>
                   <span className={styles.label}>{m.offset}</span>
-                  <OffsetControl value={offset} onNudge={nudge} m={m} />
+                  <OffsetControl value={offset} onNudge={nudge} m={m} segmented />
                 </div>
               ) : null}
 
-              <div className={styles.actions}>
-                <Button size="lg" onClick={start}>
+              <Button size="lg" onClick={start} className={styles.startBtn}>
+                <span>
                   {m.start} <span aria-hidden="true">→</span>
-                </Button>
+                </span>
+                <kbd className={styles.startKey}>enter</kbd>
+              </Button>
+
+              <div className={styles.footRow}>
+                <button type="button" className={styles.back} onClick={onBack}>
+                  ← {m.back} · {formatDuration(info.duration)}
+                </button>
                 {!videoId || silent ? null : (
                   <button type="button" className={styles.silentBtn} onClick={() => setSilent(true)}>
                     {m.silent}
                   </button>
                 )}
-                <span className={styles.keys}>
-                  {m.or} <Kbd>enter</Kbd>
-                </span>
               </div>
-
-              <button type="button" className={styles.back} onClick={onBack}>
-                ← {m.back} · {formatDuration(info.duration)}
-              </button>
             </div>
           ) : null}
 
@@ -392,9 +396,9 @@ export default function MusicSession({ pick, onBack }) {
 }
 
 /** Ajuste do atraso: ±1s para corrigir rápido, ±0,1s para o fino. */
-function OffsetControl({ value, onNudge, m, compact = false }) {
+function OffsetControl({ value, onNudge, m, compact = false, segmented = false }) {
   return (
-    <div className={`${styles.offsetRow} ${compact ? styles.offsetCompact : ""}`}>
+    <div className={`${styles.offsetRow} ${compact ? styles.offsetCompact : ""} ${segmented ? styles.segmented : ""}`}>
       <button type="button" onClick={() => onNudge(-1)} aria-label={`${m.earlier} 1s`}>−1s</button>
       <button type="button" onClick={() => onNudge(-0.1)} aria-label={`${m.earlier} 0.1s`}>−.1</button>
       <b title={m.syncHint}>{m.offsetHint(value)}</b>

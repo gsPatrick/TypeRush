@@ -87,7 +87,7 @@ export default function MusicSearch({ onPick }) {
                 <b>{r.track}</b>
                 <span>
                   {r.artist}
-                  {r.album ? <em> · {r.album}</em> : null}
+                  {r.album && r.album.toLowerCase() !== r.artist.toLowerCase() ? <em> · {r.album}</em> : null}
                 </span>
               </span>
               <span className={styles.meta}>
