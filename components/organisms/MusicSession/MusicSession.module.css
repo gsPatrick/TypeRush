@@ -25,7 +25,8 @@
 @media (min-width: 960px) {
   .ready,
   .results,
-  .loading {
+  .loading,
+  .calibrating {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
     align-items: center;
     min-height: var(--avail);
@@ -33,12 +34,14 @@
   }
   .ready .panel,
   .results .panel,
-  .loading .panel {
+  .loading .panel,
+  .calibrating .panel {
     width: 100%;
   }
   .ready .stage,
   .results .stage,
-  .loading .stage {
+  .loading .stage,
+  .calibrating .stage {
     align-self: center;
   }
 }
@@ -231,7 +234,8 @@
 @media (min-width: 960px) {
   .ready .trackbar,
   .results .trackbar,
-  .loading .trackbar {
+  .loading .trackbar,
+  .calibrating .trackbar {
     border-radius: var(--radius-lg);
   }
 }
@@ -690,4 +694,79 @@
   flex-wrap: wrap;
   gap: 0 var(--space-3);
   min-width: 0;
+}
+
+/* barra do áudio: status (centro) | sincronizar (direita), largura toda */
+.audioBar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  background: rgba(18, 20, 18, 0.6);
+}
+
+.audioBar .status {
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.calibBtn {
+  flex-shrink: 0;
+  padding: 0 var(--space-5, 20px);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  color: var(--color-ash);
+  border-left: 1px solid var(--color-hairline);
+  transition: background-color var(--duration-base), color var(--duration-base);
+}
+
+.calibBtn:hover {
+  color: var(--color-bone);
+  background: rgba(233, 236, 230, 0.05);
+}
+
+/* recomendado: sincronia não é "versão certa" e ainda não calibrou */
+.calibNeeded {
+  color: var(--color-void);
+  background: var(--color-lime);
+  border-left-color: transparent;
+}
+
+.calibNeeded:hover {
+  color: var(--color-void);
+  background: #dcfab8;
+}
+
+/* fase de calibração */
+.calib {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.calibHint {
+  color: var(--color-ash);
+}
+
+.firstLine {
+  padding: var(--space-4) var(--space-5, 20px);
+  font-family: var(--font-mono);
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-bone);
+  border-left: 2px solid var(--color-lime);
+  background: rgba(18, 20, 18, 0.6);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.calibClock {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-slate);
 }

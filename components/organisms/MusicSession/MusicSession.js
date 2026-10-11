@@ -14,6 +14,8 @@ import {
   getMusicMode,
   getOffset,
   getRelaxed,
+  isCalibrated,
+  markCalibrated,
   pushRecent,
   setMusicMode,
   setOffset as saveOffset,
@@ -45,6 +47,8 @@ export default function MusicSession({ pick, onBack }) {
   const [changingVideo, setChangingVideo] = useState(false);
   const [mode, setMode] = useState("normal");
   const [relaxed, setRelaxed] = useState(false);
+  const [calibrated, setCalibrated] = useState(false);
+  const clockRef = useRef(null);
   const playerRef = useRef(null);
 
   // letra + mídia em paralelo
@@ -78,6 +82,7 @@ export default function MusicSession({ pick, onBack }) {
   // o atraso é do par letra + vídeo: trocou o vídeo, carrega o dele
   useEffect(() => {
     setOffsetState(getOffset(pick.id, hasAudio ? videoId : null));
+    setCalibrated(hasAudio && isCalibrated(pick.id, videoId));
   }, [pick.id, videoId, hasAudio]);
 
   const persistOffset = useCallback(
@@ -96,6 +101,43 @@ export default function MusicSession({ pick, onBack }) {
     relaxed,
     onOffsetChange: persistOffset,
   });
+
+  // ── calibração: o jogador marca quando o canto começa ──────────
+  const startCalibration = useCallback(() => {
+    if (!hasAudio) return;
+    setPhase("calibrating");
+    playerRef.current?.restart();
+  }, [hasAudio]);
+
+  const cancelCalibration = useCallback(() => {
+    playerRef.current?.rewind();
+    setPhase("ready");
+  }, []);
+
+  const markStart = useCallback(() => {
+    const t = playerRef.current?.time();
+    const first = game.lines[0];
+    if (typeof t !== "number" || !first) return; // vídeo ainda não começou
+    const v = Math.max(-60, Math.min(60, Math.round((t - first.t) * 10) / 10));
+    persistOffset(v);
+    markCalibrated(pick.id, videoId);
+    setCalibrated(true);
+    playerRef.current?.rewind();
+    setPhase("ready");
+  }, [game.lines, persistOffset, pick.id, videoId]);
+
+  // relógio do vídeo durante a calibração (direto no DOM)
+  useEffect(() => {
+    if (phase !== "calibrating") return undefined;
+    let raf = 0;
+    const frame = () => {
+      const t = playerRef.current?.time();
+      if (clockRef.current) clockRef.current.textContent = m.videoAt(typeof t === "number" ? t.toFixed(1) : "0.0");
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, m]);
 
   const start = useCallback(() => {
     if (!track) return;
@@ -127,6 +169,11 @@ export default function MusicSession({ pick, onBack }) {
         e.preventDefault();
         start();
       }
+      if (phase === "calibrating" && (e.key === " " || e.key === "Enter")) {
+        e.preventDefault();
+        markStart();
+      }
+      if (phase === "calibrating" && e.key === "Escape") cancelCalibration();
       if (phase === "playing" && e.key === "Escape") {
         playerRef.current?.pause();
         game.stop();
@@ -140,7 +187,7 @@ export default function MusicSession({ pick, onBack }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, start, game, hasAudio]);
+  }, [phase, start, game, hasAudio, markStart, cancelCalibration]);
 
   const onPlayerState = useCallback(
     (ev) => {
@@ -240,11 +287,25 @@ export default function MusicSession({ pick, onBack }) {
                   ) : null}
                 </div>
                 {videoId && !silent ? (
-                  <p className={`${styles.status} ${styles[quality] || ""}`}>
-                    <i aria-hidden="true" />
-                    {m.audioYoutube}
-                    {quality && quality !== "link" ? <span> · {m.quality[quality]}</span> : null}
-                  </p>
+                  <div className={styles.audioBar}>
+                    <p className={`${styles.status} ${styles[calibrated ? "exact" : quality] || ""}`}>
+                      <i aria-hidden="true" />
+                      {m.audioYoutube}
+                      {calibrated ? (
+                        <span> · {m.calibrated} ✓</span>
+                      ) : quality && quality !== "link" ? (
+                        <span> · {m.quality[quality]}</span>
+                      ) : null}
+                    </p>
+                    <button
+                      type="button"
+                      className={`${styles.calibBtn} ${!calibrated && quality !== "exact" ? styles.calibNeeded : ""}`}
+                      onClick={startCalibration}
+                      title={m.calibrateWhy}
+                    >
+                      {calibrated ? m.recalibrate : m.calibrateTitle} ↻
+                    </button>
+                  </div>
                 ) : (
                   <ol className={styles.steps}>
                     {m.ytSteps.map((step, i) => (
@@ -354,6 +415,26 @@ export default function MusicSession({ pick, onBack }) {
                     {m.silent}
                   </button>
                 )}
+              </div>
+            </div>
+          ) : null}
+
+          {phase === "calibrating" ? (
+            <div className={styles.calib}>
+              <span className={styles.label}>{m.calibrateTitle}</span>
+              <p className={styles.calibHint}>{m.calibrateHint}</p>
+              <blockquote className={styles.firstLine}>{game.lines[0]?.original || game.lines[0]?.text}</blockquote>
+              <p ref={clockRef} className={styles.calibClock}>
+                {m.videoAt("0.0")}
+              </p>
+              <Button size="lg" onClick={markStart} className={styles.startBtn}>
+                <span>{m.markNow}</span>
+                <kbd className={styles.startKey}>espaço</kbd>
+              </Button>
+              <div className={styles.footRow}>
+                <button type="button" className={styles.back} onClick={cancelCalibration}>
+                  ← {m.cancel}
+                </button>
               </div>
             </div>
           ) : null}
