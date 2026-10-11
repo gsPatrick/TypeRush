@@ -1,0 +1,153 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-ash);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.keyLine {
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-lime);
+}
+
+.keyX {
+  margin-left: var(--space-2);
+  color: var(--color-red);
+  font-size: var(--text-sm);
+}
+
+.plot {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.grid {
+  stroke: var(--color-hairline);
+  stroke-width: 1;
+}
+
+.tickY,
+.tickX {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--color-slate);
+}
+
+.tickY {
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.tickX {
+  text-anchor: middle;
+}
+
+.area {
+  fill: var(--color-lime);
+  fill-opacity: 0.1;
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-lime);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.errRing {
+  stroke: var(--color-void);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.errMark {
+  stroke: var(--color-red);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.cross {
+  stroke: var(--color-hairline-strong);
+  stroke-width: 1;
+}
+
+.dot {
+  fill: var(--color-lime);
+  stroke: var(--color-void);
+  stroke-width: 2;
+}
+
+.tip {
+  position: absolute;
+  top: -6px;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  white-space: nowrap;
+  color: var(--color-ash);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+}
+
+.tip strong {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-bone);
+}
+
+.tipErr {
+  color: var(--color-bone);
+}
+
+.empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-slate);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

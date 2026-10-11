@@ -1,0 +1,36 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(24px, 4vh, 48px);
+  width: 100%;
+  animation: enter var(--duration-slow) var(--ease-out-expo) both;
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-slate);
+  text-align: center;
+  transition: opacity var(--duration-slow) var(--ease-out-expo);
+}
+
+.hint span {
+  color: var(--color-ash);
+}
+
+.hidden {
+  opacity: 0;
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes enter {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}

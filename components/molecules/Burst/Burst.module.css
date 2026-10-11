@@ -1,0 +1,53 @@
+.root {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.spark {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-lime);
+  transform-origin: left center;
+  animation: fly 520ms var(--ease-out-expo) forwards;
+}
+
+.combo .spark {
+  width: 10px;
+  animation-duration: 700ms;
+}
+
+.save .spark {
+  background: var(--color-bone);
+}
+
+@keyframes fly {
+  0%   { opacity: 1; transform: rotate(var(--a)) translateX(6px) scaleX(1); }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scaleX(0.3); }
+}
+
+.ring {
+  position: absolute;
+  left: -40px;
+  top: -40px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-lime);
+  animation: ring 620ms var(--ease-out-expo) forwards;
+}
+
+@keyframes ring {
+  0%   { opacity: 0.9; transform: scale(0.2); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root { display: none; }
+}

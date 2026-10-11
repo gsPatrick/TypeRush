@@ -1,0 +1,119 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 5vh, 56px);
+  width: 100%;
+  animation: enter var(--duration-slow) var(--ease-out-expo) both;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3) var(--space-4);
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.record {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  height: 26px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.06em;
+  color: var(--color-void);
+  background: var(--color-lime);
+  border-radius: var(--radius-pill);
+}
+
+.record span {
+  opacity: 0.6;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: end;
+}
+
+.heroStats {
+  display: flex;
+  gap: var(--space-12);
+}
+
+@media (min-width: 860px) {
+  .hero {
+    grid-template-columns: minmax(180px, auto) 1fr;
+    gap: var(--space-16);
+  }
+  .heroStats {
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8) var(--space-6);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--color-hairline);
+}
+
+@media (min-width: 640px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-6);
+}
+
+.keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-slate);
+}
+
+.totals {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-slate);
+}
+
+@media (max-width: 640px) {
+  .totals { margin-left: 0; width: 100%; }
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes enter {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}

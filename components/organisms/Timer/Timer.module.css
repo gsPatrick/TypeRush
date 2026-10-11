@@ -1,0 +1,228 @@
+.root {
+  --timer-ink: color-mix(in oklab, var(--color-bone), var(--color-red) calc(var(--tension) * 55%));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.readout {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-weight: 200;
+  font-size: var(--text-timer);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+  line-height: 0.9;
+  color: var(--timer-ink);
+  transition: color var(--duration-slow) var(--ease-out-expo);
+}
+
+.tenth {
+  font-size: 0.38em;
+  letter-spacing: -0.02em;
+  color: var(--color-slate);
+  margin-left: 0.04em;
+}
+
+/* Trilho de reserva: quanto do teto de 60s você tem guardado */
+.reserve {
+  position: relative;
+  width: min(320px, 70%);
+  height: 1px;
+  background: var(--color-graphite);
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: var(--color-lime);
+  transition: background-color var(--duration-slow) var(--ease-out-expo);
+}
+
+.cap {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-slate);
+}
+
+/* ── tensão ─────────────────────────────────────────────── */
+.root[data-level="2"],
+.root[data-level="3"] {
+  --timer-ink: var(--color-red);
+}
+
+.root[data-level="1"] .fill,
+.root[data-level="2"] .fill,
+.root[data-level="3"] .fill {
+  background: var(--color-red);
+}
+
+.root[data-level="3"] .readout {
+  animation: pulse 1s var(--ease-out-expo) infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1.035); }
+  45%  { transform: scale(1); }
+}
+
+.shake .readout {
+  animation: shake 260ms var(--ease-out-expo);
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-6px); }
+  55%  { transform: translateX(4px); }
+  80%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── overdrive ──────────────────────────────────────────── */
+
+/* durante a explosão o placar ocupa este lugar */
+.readout {
+  transition: color var(--duration-slow) var(--ease-out-expo), opacity 400ms var(--ease-out-expo), filter 400ms var(--ease-out-expo);
+}
+
+:global(html[data-blast]) .readout {
+  opacity: 0.06;
+  filter: blur(8px);
+  transition-duration: 120ms;
+}
+
+/* marca dos 30s na reserva: mostra a linha a cruzar */
+.threshold {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: var(--color-slate);
+}
+
+.root[data-overdrive="on"],
+.root[data-overdrive="grace"] {
+  --timer-ink: var(--color-lime);
+}
+
+.root[data-overdrive="on"] .readout {
+  text-shadow: 0 0 32px rgba(206, 247, 158, 0.28);
+}
+
+.root[data-overdrive="on"] .fill,
+.root[data-overdrive="grace"] .fill {
+  box-shadow: 0 0 10px rgba(206, 247, 158, 0.7);
+}
+
+.root[data-overdrive="on"] .threshold,
+.root[data-overdrive="grace"] .threshold {
+  background: var(--color-void);
+}
+
+/* cronômetro da sessão — à esquerda do número, espelhando os deltas */
+.od {
+  position: absolute;
+  top: 0.38em;
+  right: calc(100% + 0.9rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: var(--text-base);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--color-lime);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition:
+    opacity var(--duration-base) var(--ease-out-expo),
+    transform var(--duration-base) var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.odLabel {
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.odTime {
+  font-size: 1.375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.root[data-overdrive="on"] .od,
+.root[data-overdrive="grace"] .od {
+  opacity: 1;
+  transform: none;
+}
+
+/* tolerância: o relógio caiu para 30s — a sessão pisca, ainda dá para salvar */
+.root[data-overdrive="grace"] .od {
+  animation: graceBlink 300ms steps(1) infinite;
+}
+
+@keyframes graceBlink {
+  50% { opacity: 0.35; }
+}
+
+/* onda de choque na entrada */
+.shock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.4em;
+  height: 1.4em;
+  margin: -0.7em 0 0 -0.7em;
+  border-radius: 50%;
+  border: 2px solid var(--color-lime);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.odEnter .shock {
+  animation: shock 700ms var(--ease-out-expo);
+}
+
+.odEnter .sec,
+.odEnter .tenth {
+  animation: odFlash 600ms var(--ease-out-expo);
+}
+
+@keyframes shock {
+  0%   { opacity: 0.9; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes odFlash {
+  0%   { color: #fff; text-shadow: 0 0 40px rgba(206, 247, 158, 0.9); }
+  100% { text-shadow: inherit; }
+}
+
+@media (max-width: 640px) {
+  .od { right: calc(100% + 0.4rem); }
+  .odLabel { display: none; }
+  .odTime { font-size: var(--text-base); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-level="3"] .readout,
+  .shake .readout,
+  .odEnter .shock,
+  .odEnter .sec,
+  .odEnter .tenth,
+  .root[data-overdrive="grace"] .od {
+    animation: none;
+  }
+}

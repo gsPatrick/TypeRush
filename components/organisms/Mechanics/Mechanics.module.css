@@ -1,0 +1,242 @@
+.section {
+  max-width: calc(var(--column) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: clamp(80px, 12vw, 180px) var(--gutter);
+}
+
+.head {
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.kicker {
+  display: block;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.h2 {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: var(--color-bone);
+}
+
+.muted {
+  color: var(--color-slate);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: 1.35fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .overdrive { grid-row: span 2; }
+  .wide { grid-column: 1 / -1; }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  min-height: 260px;
+  padding: clamp(24px, 3vw, 40px);
+  border: 1px solid var(--color-hairline);
+  border-radius: 24px;
+  background: var(--color-surface);
+}
+
+.copy h3 {
+  margin-bottom: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+  color: var(--color-bone);
+}
+
+.copy p {
+  max-width: 46ch;
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--color-ash);
+}
+
+/* ── overdrive: o único bloco com cor ─────────────────────── */
+.overdrive {
+  min-height: clamp(380px, 60vw, 520px);
+  background:
+    radial-gradient(90% 60% at 50% 110%, rgba(206, 247, 158, 0.14), transparent 70%),
+    var(--color-surface);
+}
+
+.odVisual {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.odLabel {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-lime);
+}
+
+.odLabel b {
+  margin-left: 0.5em;
+  font-weight: 400;
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+}
+
+.odNumber {
+  font-family: var(--font-mono);
+  font-weight: 200;
+  font-size: clamp(5rem, 3rem + 7vw, 8.5rem);
+  line-height: 0.9;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-lime);
+  text-shadow: 0 0 40px rgba(206, 247, 158, 0.3);
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+.odNumber span {
+  font-size: 0.38em;
+  color: var(--color-slate);
+  text-shadow: none;
+}
+
+.odBar {
+  position: relative;
+  width: min(240px, 70%);
+  height: 1px;
+  background: var(--color-graphite);
+}
+
+.odBar span {
+  position: absolute;
+  inset: 0;
+  width: 69%;
+  background: var(--color-lime);
+  box-shadow: 0 0 10px rgba(206, 247, 158, 0.7);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* ── combo: os 10 pontos enchendo em loop ─────────────────── */
+.combo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.combo i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-graphite);
+  animation: fill 2.6s steps(1) infinite;
+}
+
+.combo b {
+  margin-left: var(--space-3);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+}
+
+/* acende em sequência (delay por ponto) e apaga junto no fim do ciclo */
+@keyframes fill {
+  0%   { background: var(--color-graphite); }
+  1%, 85% { background: var(--color-bone); }
+  86%, 100% { background: var(--color-graphite); }
+}
+
+/* ── retry ─────────────────────────────────────────────────── */
+.retry {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-family: var(--font-mono);
+}
+
+.wrongWord {
+  position: relative;
+  font-size: 1.375rem;
+  color: var(--color-bone);
+}
+
+.wrongWord::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-red);
+}
+
+.retry b {
+  font-weight: 400;
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+}
+
+/* ── idiomas ───────────────────────────────────────────────── */
+.wide {
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  .wide {
+    flex-direction: row;
+    align-items: center;
+  }
+  .wide .copy { order: -1; }
+}
+
+.langs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.flag {
+  width: 30px;
+  height: 21px;
+}
+
+.accents {
+  margin-left: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  letter-spacing: 0.08em;
+  color: var(--color-bone);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .odNumber, .combo i { animation: none; }
+  .combo i:nth-child(-n + 7) { background: var(--color-bone); }
+}

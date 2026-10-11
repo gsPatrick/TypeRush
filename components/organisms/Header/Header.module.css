@@ -1,0 +1,66 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: 72px;
+  transition: opacity var(--duration-slow) var(--ease-out-expo);
+}
+
+/* modo foco: durante a partida, só o jogo tem contraste */
+.dim {
+  opacity: 0.18;
+}
+
+.dim:hover {
+  opacity: 0.6;
+}
+
+.brand {
+  font-size: 1.125rem;
+  color: var(--color-bone);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .right { gap: var(--space-3); }
+}
+
+@media (max-width: 420px) {
+  /* 375px: marca vira só o símbolo para caber bandeiras + combo + recorde */
+  .brand > span:last-child { display: none; }
+}
+
+@media (max-width: 360px) {
+  .label { display: none; }
+}
+
+.best {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+}
+
+.label {
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.value {
+  font-size: var(--text-base);
+  color: var(--color-bone);
+}
+
+.home {
+  display: inline-flex;
+  color: inherit;
+  text-decoration: none;
+}

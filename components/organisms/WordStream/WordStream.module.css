@@ -1,0 +1,139 @@
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.box {
+  --line: 1.7em;
+  position: relative;
+  height: calc(var(--line) * 3);
+  /* só a vertical precisa cortar (rolagem de linhas); a horizontal fica livre
+     para o pop da palavra na borda não ser decepado. `clip` permite eixos
+     diferentes — `hidden` forçaria os dois. */
+  overflow: hidden;
+  overflow-x: visible;
+  overflow-y: clip;
+  font-family: var(--font-mono);
+  font-size: var(--text-words);
+  line-height: var(--line);
+  transition: filter var(--duration-base) var(--ease-out-expo), opacity var(--duration-base) var(--ease-out-expo);
+}
+
+.blurred {
+  filter: blur(5px);
+  opacity: 0.45;
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.3em;
+  user-select: none;
+}
+
+.caret {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 1.2em;
+  border-radius: 2px;
+  background: var(--color-lime);
+  transition: transform 90ms var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.caretMiss {
+  animation: caretMiss 420ms var(--ease-out-expo);
+}
+
+@keyframes caretMiss {
+  0%, 40% { background: var(--color-red); box-shadow: 0 0 10px rgba(255, 93, 93, 0.7); }
+  100%    { background: var(--color-lime); box-shadow: none; }
+}
+
+/* Chip de nova tentativa: some fora do lugar, sem empurrar layout */
+.retry {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  color: var(--color-ash);
+  border: 1px solid var(--color-red-soft);
+  background: var(--color-red-soft);
+  border-radius: var(--radius-pill);
+  opacity: 0;
+  transform: translate(-50%, -6px);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out-expo),
+    transform var(--duration-base) var(--ease-out-expo);
+}
+
+.retryOn {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.retry:hover {
+  color: var(--color-bone);
+}
+
+.retry b {
+  font-weight: 400;
+  color: var(--color-lime);
+}
+
+.retryKey {
+  color: var(--color-red);
+}
+
+.blink {
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Campo real: transparente, cobre a trilha (toque no celular abre o teclado) */
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px; /* < 16px faz o iOS dar zoom no foco */
+  color: transparent;
+  caret-color: transparent;
+  background: transparent;
+  border: 0;
+  outline: none;
+  cursor: text;
+}
+
+.focusHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-bone);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret { transition: none; }
+  .retry { transition: opacity var(--duration-base) linear; transform: translate(-50%, 0); }
+  .blink { animation: none; }
+}

@@ -1,0 +1,124 @@
+.section {
+  position: relative;
+  height: 450vh;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  max-width: calc(var(--column) + var(--gutter) * 2);
+  margin: 0 auto;
+  padding: clamp(96px, 14vh, 140px) var(--gutter) clamp(44px, 8vh, 88px);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ash);
+  background: rgba(233, 236, 230, 0.05);
+  border-radius: var(--radius-pill);
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.progress {
+  position: relative;
+  height: 1px;
+  margin-bottom: clamp(32px, 5vh, 44px);
+  background: var(--color-hairline-strong);
+}
+
+.progressBar {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: var(--color-bone);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr);
+  gap: var(--space-12);
+  align-items: start;
+}
+
+.index {
+  display: inline-flex;
+  gap: 6px;
+  width: fit-content;
+  padding: 12px 17px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1;
+  color: var(--color-bone);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 20px;
+}
+
+.dim {
+  color: var(--color-slate);
+}
+
+/* declarações empilhadas; min-height cabe a mais longa no menor breakpoint */
+.main {
+  position: relative;
+  min-height: clamp(240px, 44vh, 420px);
+}
+
+.statement {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: max(1.5rem, min(calc(1.5rem + 0.024 * (100vw - 27.5rem)), 3rem));
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+  text-wrap: pretty;
+  transition: opacity 0.3s ease;
+}
+
+/* inline, nunca inline-block: um span só com espaço colapsaria (recipe) */
+.char {
+  color: var(--color-slate);
+  transition: color 0.12s linear;
+}
+
+.typed {
+  color: var(--color-bone);
+}
+
+/* cursor: barra lime à esquerda do próximo caractere */
+.at {
+  box-shadow: inset 2px 0 0 var(--color-lime);
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+  .main {
+    min-height: clamp(280px, 52vh, 440px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char { color: var(--color-bone) !important; transition: none; }
+  .at { box-shadow: none; }
+}

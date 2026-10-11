@@ -1,0 +1,93 @@
+.header {
+  position: fixed;
+  top: clamp(12px, 1.6vw, 24px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 0 var(--gutter);
+  pointer-events: none;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  max-width: var(--column);
+  margin: 0 auto;
+  padding: 10px 10px 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  pointer-events: auto;
+  animation: intro 0.9s var(--ease-out-expo) 0.2s both;
+  transition:
+    background-color 0.5s var(--ease-out-expo),
+    border-color 0.5s var(--ease-out-expo),
+    box-shadow 0.5s var(--ease-out-expo);
+}
+
+/* Vidro escuro: os cinco valores da recipe, invertidos para o void */
+.scrolled .inner {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  background: rgba(18, 20, 18, 0.72);
+  border-color: rgba(233, 236, 230, 0.08);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.brand {
+  font-size: 1.0625rem;
+  color: var(--color-bone);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.link {
+  padding: 9px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+  text-decoration: none;
+  border-radius: var(--radius-pill);
+  transition: color var(--duration-base) var(--ease-out-expo), background-color var(--duration-base) var(--ease-out-expo);
+}
+
+.link:hover {
+  color: var(--color-bone);
+  background: rgba(233, 236, 230, 0.05);
+}
+
+.cta {
+  margin-left: var(--space-2);
+  padding: 9px 18px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-void);
+  background: var(--color-bone);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: background-color var(--duration-base) var(--ease-out-expo);
+}
+
+/* bone, não lime: o lime da dobra é do CTA do herói (um acento por tela) */
+.cta:hover {
+  background: var(--color-lime);
+}
+
+@keyframes intro {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 640px) {
+  .link { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner { animation: none; transition: none; }
+}

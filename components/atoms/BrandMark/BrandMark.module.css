@@ -1,0 +1,33 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  line-height: 1;
+}
+
+.symbol {
+  display: block;
+  flex-shrink: 0;
+  width: 1.25em;
+  height: 1.25em;
+  overflow: visible;
+}
+
+.dial {
+  stroke: var(--bm-dial, currentColor);
+}
+
+.caret {
+  fill: var(--bm-caret, #cef79e);
+}
+
+.word {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+  color: var(--color-ash);
+}
+
+.word em {
+  font-style: normal;
+  color: var(--color-bone);
+}

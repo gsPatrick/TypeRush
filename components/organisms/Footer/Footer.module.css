@@ -1,0 +1,40 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-8);
+  padding: var(--space-6) 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-slate);
+  transition: opacity var(--duration-slow) var(--ease-out-expo);
+}
+
+.dim {
+  opacity: 0;
+}
+
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.keys span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rules b {
+  font-weight: 400;
+}
+
+.gain { color: var(--color-ash); }
+.loss { color: var(--color-ash); }
+
+/* teclas não existem no celular */
+@media (pointer: coarse) {
+  .keys { display: none; }
+}

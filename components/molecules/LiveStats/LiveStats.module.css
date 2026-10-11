@@ -1,0 +1,85 @@
+.root {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-8);
+  opacity: 0.45;
+  transition: opacity var(--duration-slow) var(--ease-out-expo);
+}
+
+.active {
+  opacity: 1;
+}
+
+.item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+}
+
+.value {
+  min-width: 2ch;
+  text-align: right;
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-bone);
+}
+
+.red { color: var(--color-red); }
+
+.label {
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.meter {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: var(--space-1);
+  align-self: center;
+}
+
+.meter i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-graphite);
+  transition: background-color var(--duration-base) var(--ease-out-expo);
+}
+
+.meter i.on {
+  background: var(--color-lime);
+  animation: dot 300ms var(--ease-out-expo);
+}
+
+@keyframes dot {
+  0%  { transform: scale(2.2); }
+  100% { transform: scale(1); }
+}
+
+/* combo fechado: os 10 pontos acendem juntos e esfriam */
+.full i {
+  animation: full 700ms var(--ease-out-expo);
+}
+
+@keyframes full {
+  0%, 30% { background: var(--color-lime); box-shadow: 0 0 6px var(--color-lime); }
+  100%    { background: var(--color-graphite); box-shadow: none; }
+}
+
+.bump {
+  display: inline-block;
+  animation: bump 320ms var(--ease-out-expo);
+}
+
+@keyframes bump {
+  0%   { transform: scale(1.35); color: var(--color-lime); }
+  100% { transform: scale(1); color: var(--color-bone); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meter i.on, .full i, .bump { animation: none; }
+}

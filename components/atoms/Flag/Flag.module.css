@@ -1,0 +1,10 @@
+.root {
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  /* contorno hairline: a bandeira não "vaza" no fundo escuro */
+  box-shadow: 0 0 0 1px var(--color-hairline-strong);
+}

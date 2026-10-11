@@ -1,0 +1,61 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 30px;
+  padding: 0 var(--space-3) 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+  border-radius: var(--radius-pill);
+  transition:
+    background-color var(--duration-base) var(--ease-out-expo),
+    color var(--duration-base) var(--ease-out-expo);
+}
+
+.flag {
+  filter: grayscale(1);
+  opacity: 0.45;
+  transition: filter var(--duration-base) var(--ease-out-expo), opacity var(--duration-base) var(--ease-out-expo);
+}
+
+.option:hover:not(:disabled) {
+  color: var(--color-ash);
+}
+
+.option:hover:not(:disabled) .flag {
+  filter: grayscale(0.4);
+  opacity: 0.8;
+}
+
+.active {
+  color: var(--color-bone);
+  background: var(--color-surface-raised);
+}
+
+.active .flag,
+.active:hover .flag {
+  filter: none;
+  opacity: 1;
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+/* celular: só a bandeira — o header não tem largura para o código */
+@media (max-width: 480px) {
+  .option { padding: 0 var(--space-2); }
+  .code { display: none; }
+}

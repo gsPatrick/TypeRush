@@ -1,0 +1,78 @@
+.shell {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: 100%;
+  max-width: calc(var(--column) + var(--gutter) * 2);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 6vh, 80px) 0;
+}
+
+/* Celular: o teclado virtual come metade da tela — o jogo sobe para o topo */
+@media (max-width: 640px), (max-height: 560px) {
+  .stage {
+    align-items: flex-start;
+    padding-top: var(--space-6);
+  }
+}
+
+/* Tensão: brilho vermelho que cresce das bordas nos últimos 10s */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(255, 93, 93, 0.22) 100%);
+  opacity: var(--tension);
+  transition: opacity var(--duration-slow) linear;
+}
+
+/* Overdrive: aura lime subindo das bordas, respirando devagar */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(90% 55% at 50% 108%, rgba(206, 247, 158, 0.16), transparent 70%),
+    radial-gradient(70% 40% at 50% -8%, rgba(206, 247, 158, 0.08), transparent 70%),
+    radial-gradient(130% 100% at 50% 45%, transparent 60%, rgba(206, 247, 158, 0.07) 100%);
+  opacity: 0;
+  transition: opacity 700ms var(--ease-out-expo);
+}
+
+:global(html[data-overdrive="on"]) .aurora {
+  opacity: 1;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+:global(html[data-overdrive="grace"]) .aurora {
+  opacity: 0.35;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+
+:global(html[data-tension="3"]) .vignette {
+  animation: throb 1s var(--ease-out-expo) infinite;
+}
+
+@keyframes throb {
+  0%   { filter: brightness(1.6); }
+  50%  { filter: brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(html[data-tension="3"]) .vignette { animation: none; }
+  :global(html[data-overdrive="on"]) .aurora { animation: none; }
+}

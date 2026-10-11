@@ -1,0 +1,39 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-slate);
+  border-radius: var(--radius-pill);
+  transition: color var(--duration-base) var(--ease-out-expo);
+}
+
+.root:hover,
+.on {
+  color: var(--color-ash);
+}
+
+.on:hover {
+  color: var(--color-bone);
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  overflow: visible;
+}
+
+.body {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.wave {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}

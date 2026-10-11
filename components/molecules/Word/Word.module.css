@@ -1,0 +1,121 @@
+.word {
+  position: relative;
+  display: inline-block;
+  margin: 0 0.3em;
+  color: var(--color-slate);
+  white-space: nowrap;
+  transform-origin: 50% 70%;
+  transition: color var(--duration-fast) linear;
+}
+
+.done {
+  color: var(--color-bone);
+}
+
+.pending {
+  color: var(--color-slate);
+}
+
+.correct {
+  color: var(--color-bone);
+}
+
+.incorrect {
+  color: var(--color-red);
+}
+
+.extra {
+  color: var(--color-red);
+  opacity: 0.55;
+}
+
+/* Composição de acento em curso: neutra, sublinhado pontilhado */
+.composing {
+  color: var(--color-ash);
+  text-decoration: underline dotted var(--color-ash);
+  text-underline-offset: 0.25em;
+}
+
+/* Palavra enviada com erro: traço vermelho (pseudo-elemento, para poder
+   ser "desenhado" da esquerda para a direita no momento do erro) */
+.wrong::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.12em;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-red);
+  transform-origin: left center;
+}
+
+.wrong .pending {
+  color: var(--color-slate);
+}
+
+/* ── juice ─────────────────────────────────────────────────
+   Acerto: pop curto com flash lime que esfria para o branco.
+   Erro: tremor + traço desenhado. Tudo < 450ms: nunca atrasa a leitura
+   da próxima palavra. */
+
+.fx_correct {
+  animation: pop 380ms var(--ease-out-expo);
+}
+
+.fx_save {
+  animation: pop 420ms var(--ease-out-expo);
+}
+
+.fx_combo {
+  animation: popBig 560ms var(--ease-out-expo);
+}
+
+@keyframes pop {
+  0%   { color: var(--color-lime); transform: scale(1); }
+  30%  { color: var(--color-lime); transform: scale(1.09) translateY(-2px); }
+  100% { color: var(--color-bone); transform: scale(1); }
+}
+
+@keyframes popBig {
+  0%   { color: var(--color-lime); transform: scale(1); text-shadow: 0 0 0 transparent; }
+  30%  { color: var(--color-lime); transform: scale(1.16) translateY(-3px); text-shadow: 0 0 18px rgba(206, 247, 158, 0.55); }
+  100% { color: var(--color-bone); transform: scale(1); text-shadow: 0 0 0 transparent; }
+}
+
+.fx_wrong {
+  animation: shake 320ms var(--ease-out-expo);
+}
+
+.fx_wrong::after {
+  animation: draw 260ms var(--ease-out-expo) both;
+}
+
+@keyframes shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-5px); }
+  45%  { transform: translateX(4px); }
+  70%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Retry: a palavra "volta" da direita, com um halo vermelho que se apaga */
+.fx_retry {
+  animation: rewind 360ms var(--ease-out-expo);
+}
+
+@keyframes rewind {
+  0%   { transform: translateX(10px); opacity: 0.4; text-shadow: 0 0 14px rgba(255, 93, 93, 0.6); }
+  100% { transform: none; opacity: 1; text-shadow: 0 0 0 transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx_correct, .fx_save, .fx_combo, .fx_wrong, .fx_retry, .fx_wrong::after {
+    animation: none;
+  }
+}
