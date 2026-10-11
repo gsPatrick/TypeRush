@@ -7,6 +7,14 @@ import { getAllBest, getRecent } from "@/lib/music/storage";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./MusicSearch.module.css";
 
+// músicas com letra sincronizada boa na LRCLIB (para quem chega sem ideia)
+const SUGGESTIONS = [
+  "chitãozinho - evidências",
+  "nirvana - smells like teen spirit",
+  "rick astley - never gonna give you up",
+  "queen - bohemian rhapsody",
+];
+
 /** Busca com debounce na LRCLIB (via /api/music/search). Só lista o que tem letra sincronizada. */
 export default function MusicSearch({ onPick }) {
   const { t } = useLocale();
@@ -49,33 +57,48 @@ export default function MusicSearch({ onPick }) {
 
   const list = q.trim().length >= 2 ? state.results : recent;
 
+  const searching = q.trim().length >= 2;
+
   return (
     <section className={styles.root}>
       <div className={styles.intro}>
         <span className={styles.kicker}>{m.nav}</span>
         <h1 className={styles.h1}>{m.title}</h1>
         <p className={styles.lede}>{m.lede}</p>
+        <p className={styles.features}>{m.features}</p>
       </div>
 
-      <div className={styles.searchBox}>
-        <input
-          ref={inputRef}
-          className={styles.input}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={m.searchPlaceholder}
-          aria-label={m.searchPlaceholder}
-          spellCheck={false}
-          autoComplete="off"
-        />
-        <span className={styles.hint}>{state.status === "loading" ? m.searching : m.searchHint}</span>
-      </div>
+      <div className={styles.panel}>
+        <div className={styles.searchBox}>
+          <input
+            ref={inputRef}
+            className={styles.input}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={m.searchPlaceholder}
+            aria-label={m.searchPlaceholder}
+            spellCheck={false}
+            autoComplete="off"
+          />
+          <span className={styles.hint}>{state.status === "loading" ? m.searching : m.searchHint}</span>
+        </div>
 
-      {state.status === "busy" ? <p className={styles.msg}>{m.busy}</p> : null}
-      {state.status === "failed" ? <p className={styles.msg}>{m.failed}</p> : null}
-      {state.status === "done" && !state.results.length ? <p className={styles.msg}>{m.noResults}</p> : null}
+        {state.status === "busy" ? <p className={styles.msg}>{m.busy}</p> : null}
+        {state.status === "failed" ? <p className={styles.msg}>{m.failed}</p> : null}
+        {state.status === "done" && !state.results.length ? <p className={styles.msg}>{m.noResults}</p> : null}
 
-      {q.trim().length < 2 && recent.length ? <span className={styles.label}>{m.recent}</span> : null}
+        {!searching && recent.length ? <span className={styles.label}>{m.recent}</span> : null}
+
+        {!searching && !recent.length ? (
+          <div className={styles.suggest}>
+            <span className={styles.label}>{m.tryThese}</span>
+            {SUGGESTIONS.map((sgt) => (
+              <button key={sgt} type="button" className={styles.chip} onClick={() => setQ(sgt)}>
+                {sgt}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
       <ul className={styles.list}>
         {list.map((r) => (
@@ -106,6 +129,7 @@ export default function MusicSearch({ onPick }) {
           </li>
         ))}
       </ul>
+      </div>
     </section>
   );
 }

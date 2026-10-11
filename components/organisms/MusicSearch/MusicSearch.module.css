@@ -1,8 +1,76 @@
+/* mesma disposição do duelo: apresentação | busca, nas bordas do header,
+   centralizado na altura; a lista rola DENTRO do painel (página não rola) */
 .root {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  align-items: center;
+}
+
+@media (min-width: 960px) {
+  .root {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-16);
+    min-height: calc(100dvh - 72px - 48px);
+  }
+}
+
+.intro {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  max-width: 760px;
+  gap: var(--space-4);
+}
+
+.features {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1.7;
+  color: var(--color-slate);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@media (min-width: 960px) {
+  .panel {
+    height: min(620px, calc(100dvh - 72px - 72px));
+  }
+  .list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-graphite) transparent;
+  }
+}
+
+.suggest {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.chip {
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-align: left;
+  color: var(--color-ash);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  background: rgba(18, 20, 18, 0.5);
+  transition: border-color var(--duration-base), color var(--duration-base);
+}
+
+.chip:hover {
+  color: var(--color-bone);
+  border-color: var(--color-hairline-strong);
 }
 
 .kicker,
@@ -15,20 +83,20 @@
   color: var(--color-slate);
 }
 
-.kicker { margin-bottom: var(--space-3); }
+.kicker { margin-bottom: 0; }
 
 .h1 {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: clamp(2.75rem, 1.8rem + 4vw, 4.5rem);
+  font-size: clamp(2.75rem, 1.8rem + 4vw, 5rem);
   line-height: 1;
   letter-spacing: -0.045em;
   color: var(--color-bone);
 }
 
 .lede {
-  max-width: 50ch;
-  margin-top: var(--space-4);
+  max-width: 40ch;
+  font-size: 1.0625rem;
   color: var(--color-ash);
 }
 
@@ -40,7 +108,7 @@
 
 .input {
   width: 100%;
-  height: 60px;
+  height: 56px;
   padding: 0 var(--space-6);
   font-family: var(--font-mono);
   font-size: 1.125rem;
