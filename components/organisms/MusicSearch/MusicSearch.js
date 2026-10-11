@@ -100,6 +100,7 @@ export default function MusicSearch({ onPick }) {
           </div>
         ) : null}
 
+      {list.length ? (
       <ul className={styles.list}>
         {list.map((r) => (
           <li key={r.id}>
@@ -129,6 +130,7 @@ export default function MusicSearch({ onPick }) {
           </li>
         ))}
       </ul>
+      ) : null}
       </div>
     </section>
   );

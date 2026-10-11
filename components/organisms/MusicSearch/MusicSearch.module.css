@@ -36,13 +36,11 @@
   min-width: 0;
 }
 
+/* painel na altura do conteúdo → centralizado com a apresentação; a lista
+   tem teto (cabe na janela) e rola por dentro quando passa dele */
 @media (min-width: 960px) {
-  .panel {
-    height: min(620px, calc(100dvh - 72px - 72px));
-  }
   .list {
-    flex: 1;
-    min-height: 0;
+    max-height: calc(100dvh - 72px - 260px);
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--color-graphite) transparent;
