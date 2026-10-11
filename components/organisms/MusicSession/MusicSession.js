@@ -317,7 +317,7 @@ export default function MusicSession({ pick, onBack }) {
                 )}
                 {showLinkForm ? (
                   <div className={styles.ytRow}>
-                    <YouTubeSearchButton artist={info.artist} track={info.track} label={m.ytSearch} />
+                    <YouTubeSearchButton artist={info.artist} track={info.track} label={m.ytSearch} title={m.ytTip} />
                     <form
                     className={styles.linkRow}
                     onSubmit={(e) => {
@@ -352,7 +352,7 @@ export default function MusicSession({ pick, onBack }) {
                 ) : null}
 
                 {linkError ? <p className={styles.err}>{m.badLink}</p> : null}
-                {showLinkForm ? <p className={styles.hint}>{m.ytTip}</p> : null}
+
               </div>
 
               <div className={styles.modeBox}>

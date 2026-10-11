@@ -770,3 +770,42 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-slate);
 }
+
+/* passos: barra de 3 segmentos iguais na largura toda (mesmas bordas do resto) */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  background: rgba(18, 20, 18, 0.6);
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  white-space: nowrap;
+}
+
+.steps li + li {
+  border-left: 1px solid var(--color-hairline);
+}
+
+@media (max-width: 420px) {
+  .steps li { font-size: var(--text-micro); }
+  .steps b { margin-right: 6px; }
+}
+
+.steps b {
+  flex-shrink: 0; /* o número nunca é espremido pelo texto */
+}
+
+.steps li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
