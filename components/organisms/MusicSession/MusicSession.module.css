@@ -538,7 +538,7 @@
 
 /* ── preparo: tudo na mesma grade, bordas alinhadas ─────────── */
 .readyBox {
-  gap: var(--space-5, 20px);
+  gap: var(--space-4);
 }
 
 .readyBox .label {
