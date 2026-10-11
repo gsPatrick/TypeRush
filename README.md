@@ -13,6 +13,22 @@ npm run dev     # http://localhost:3017  (landing) · /play (jogo)
 |---|---|
 | `/` | landing — o jogo se jogando sozinho no herói, regras "digitadas" pelo scroll |
 | `/play` | o jogo |
+| `/duel` | duelo online 1×1 — sala com código/link, P2P |
+
+## Duelo online (P2P, sem servidor)
+
+Os navegadores se conectam direto (WebRTC) via [Trystero](https://github.com/dmotz/trystero);
+relays Nostr públicos só servem para os dois se acharem. Não há backend.
+
+- **Anfitrião = juiz.** Quem cria a sala decide o resultado (`lib/duel/referee.js`)
+  comparando o tempo de cada um medido no próprio relógio desde o "vai!".
+  Janela de 600ms para o "caíram quase juntos".
+- **Mesmas palavras** para os dois: motor com semente (`lib/game/rng.js`).
+- **Modos** (`lib/duel/modes.js`): Sobrevivência, Overdrive (10s em overdrive
+  vence), Livre (60s fixos, mais palavras) e Morte súbita (um erro e acabou).
+- **Limites conhecidos:** algumas redes corporativas/4G bloqueiam P2P sem um
+  servidor TURN; o juiz é o navegador do anfitrião (bom entre amigos, não para
+  ranking público); relays públicos têm limite de taxa por IP.
 
 Só frontend: Next.js 14 (App Router), JavaScript, CSS Modules. Recordes ficam em
 `localStorage` (`typerush:v1`).
@@ -29,7 +45,10 @@ lib/game/            lógica pura — sem React, testável em Node
   words.js           vocabulário pt-BR
   generateWords.js   sorteio sem repetição próxima
   storage.js         recordes e totais
-hooks/useTypeRush.js ponte motor ↔ React (relógio fora do estado)
+  rng.js             aleatório com semente (duelo)
+lib/duel/            modos, juiz, resumo de partida, códigos de sala
+hooks/useTypeRush.js ponte motor ↔ React (relógio fora do estado); modo duelo opcional
+hooks/useDuelRoom.js sala P2P: conexão, fases, juiz, revanche
 components/
   atoms/             BrandMark · Button · Kbd
   molecules/         Word · TimeDeltas · StatBlock · LiveStats · ComboToggle · WpmChart

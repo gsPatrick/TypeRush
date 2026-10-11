@@ -1,0 +1,36 @@
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  /* cobre a arena: o número não pode brigar com o "30.0" do relógio */
+  background: rgba(11, 12, 11, 0.94);
+  border-radius: var(--radius-lg);
+}
+
+.n {
+  font-family: var(--font-mono);
+  font-weight: 200;
+  font-size: clamp(7rem, 4rem + 14vw, 14rem);
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-bone);
+  animation: pop 900ms var(--ease-out-expo) both;
+}
+
+.go {
+  color: var(--color-lime);
+  text-shadow: 0 0 48px rgba(206, 247, 158, 0.5);
+}
+
+@keyframes pop {
+  0%   { opacity: 0; transform: scale(1.6); }
+  25%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.85; transform: scale(0.94); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .n { animation: none; }
+}

@@ -1,0 +1,115 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-2);
+  font-family: var(--font-mono);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  transition: border-color var(--duration-slow) var(--ease-out-expo), opacity var(--duration-slow);
+}
+
+.od {
+  border-color: var(--color-rival);
+  box-shadow: 0 0 18px var(--color-rival-soft);
+}
+
+.down {
+  opacity: 0.55;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  font-size: var(--text-sm);
+  color: var(--color-void);
+  background: var(--color-rival);
+  border-radius: 50%;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.who b {
+  max-width: 12ch;
+  overflow: hidden;
+  font-weight: 400;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-bone);
+}
+
+.who small {
+  font-size: var(--text-micro);
+  color: var(--color-slate);
+}
+
+.down .who small {
+  color: var(--color-red);
+}
+
+.clock {
+  font-weight: 200;
+  font-size: 1.625rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--color-rival);
+}
+
+.clock small {
+  margin-left: 2px;
+  font-size: 0.5em;
+  color: var(--color-slate);
+}
+
+.stat {
+  font-size: var(--text-micro);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-slate);
+}
+
+.stat b {
+  margin-right: 0.3em;
+  font-weight: 400;
+  font-size: var(--text-sm);
+  color: var(--color-bone);
+}
+
+.goal {
+  position: relative;
+  width: 56px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-graphite);
+}
+
+.goal span {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: var(--color-rival);
+  transition: transform 160ms linear;
+}
+
+.root {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* celular: avatar, nome, relógio e meta — as contagens não cabem */
+@media (max-width: 560px) {
+  .stat { display: none; }
+  .root { gap: var(--space-3); }
+}

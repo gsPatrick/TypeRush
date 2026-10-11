@@ -1,0 +1,52 @@
+.root {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 560px) {
+  .root { grid-template-columns: 1fr; }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-4);
+  text-align: left;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  transition:
+    border-color var(--duration-base) var(--ease-out-expo),
+    background-color var(--duration-base) var(--ease-out-expo),
+    opacity var(--duration-base) var(--ease-out-expo);
+}
+
+.card:hover:not(:disabled) {
+  border-color: var(--color-hairline-strong);
+}
+
+.card:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.active,
+.active:hover:not(:disabled) {
+  border-color: var(--color-lime);
+  background: linear-gradient(var(--color-lime-soft), var(--color-lime-soft)), var(--color-surface);
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--color-bone);
+}
+
+.rule {
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-ash);
+}

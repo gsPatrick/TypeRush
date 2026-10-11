@@ -1,0 +1,67 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 3vh, 36px);
+  width: 100%;
+  min-width: 0; /* item flex: sem isso o conteúdo mais largo estica a página */
+}
+
+.top {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.arena {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 3.5vh, 40px);
+  width: 100%;
+  transition: opacity var(--duration-slow) var(--ease-out-expo), filter var(--duration-slow) var(--ease-out-expo);
+}
+
+.faded {
+  opacity: 0.12;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.rule {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-slate);
+  text-align: center;
+}
+
+.goal {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.goalTrack {
+  position: relative;
+  width: 160px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-graphite);
+}
+
+.goalFill {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: var(--color-lime);
+  box-shadow: 0 0 8px rgba(206, 247, 158, 0.6);
+}

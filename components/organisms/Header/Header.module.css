@@ -64,3 +64,19 @@
   color: inherit;
   text-decoration: none;
 }
+
+.duel {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-out-expo);
+}
+
+.duel:hover {
+  color: var(--color-bone);
+}
+
+@media (max-width: 640px) {
+  .duel { display: none; }
+}

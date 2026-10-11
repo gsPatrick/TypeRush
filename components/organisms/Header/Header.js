@@ -14,6 +14,9 @@ export default function Header({ combo, onToggleCombo, lang, onChangeLanguage, s
         <BrandMark className={styles.brand} />
       </Link>
       <div className={styles.right}>
+        <Link href="/duel" className={styles.duel}>
+          {t.duel.nav}
+        </Link>
         <LanguageSwitch value={lang} onChange={onChangeLanguage} disabled={running} />
         <ComboToggle enabled={combo} onToggle={onToggleCombo} disabled={running} />
         <SoundToggle enabled={sound} onToggle={onToggleSound} />

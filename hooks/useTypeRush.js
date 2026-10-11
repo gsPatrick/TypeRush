@@ -5,6 +5,7 @@ import { createEngine } from "@/lib/game/engine";
 import { now, tensionLevel } from "@/lib/game/clock";
 import { DEFAULT_LANG, LANGUAGES } from "@/lib/game/languages";
 import { loadPrefs, loadProfile, recordGame, savePrefs } from "@/lib/game/storage";
+import { seededRandom } from "@/lib/game/rng";
 import * as sfx from "@/lib/audio/sfx";
 
 /**
@@ -15,8 +16,32 @@ import * as sfx from "@/lib/audio/sfx";
  *   `remaining` aos assinantes (`subscribeClock`), que escrevem direto no DOM.
  * - Re-render só acontece em eventos de jogo: tecla, envio, fim, reinício.
  * - O WPM ao vivo vira estado no máximo 4×/s, e só se o número mudar.
+ *
+ * Modo duelo (`duel = { seed, config, lang }`): mesmo motor, mas
+ * - palavras com semente (os dois jogadores recebem a mesma lista);
+ * - regras do modo (`config`);
+ * - não grava recorde; o fim vai para `onFinish(result)`;
+ * - a digitação fica travada até `startNow()` (o "vai!" do 3-2-1) — o relógio
+ *   dos dois começa junto, não na primeira tecla;
+ * - `forceFinish()` encerra de fora (o adversário caiu primeiro).
  */
-export default function useTypeRush() {
+function makeEngine({ combo, lang, duel }) {
+  if (duel) {
+    return createEngine({
+      combo: true,
+      pool: LANGUAGES[duel.lang].words,
+      config: duel.config,
+      rng: seededRandom(duel.seed),
+    });
+  }
+  return createEngine({ combo, pool: LANGUAGES[lang].words });
+}
+
+export default function useTypeRush({ duel = null, onFinish } = {}) {
+  const duelRef = useRef(duel);
+  duelRef.current = duel;
+  const onFinishRef = useRef(onFinish);
+  onFinishRef.current = onFinish;
   const [combo, setCombo] = useState(true);
   const [lang, setLang] = useState(DEFAULT_LANG);
   const [sound, setSound] = useState(true);
@@ -27,7 +52,7 @@ export default function useTypeRush() {
   const [overdrive, setOverdrive] = useState({ active: false, id: 0 });
   const [blast, setBlast] = useState(null);
   const engineRef = useRef(null);
-  if (engineRef.current === null) engineRef.current = createEngine({ combo: true });
+  if (engineRef.current === null) engineRef.current = makeEngine({ combo: true, lang: DEFAULT_LANG, duel });
 
   const [, bump] = useReducer((x) => x + 1, 0);
   const [round, setRound] = useState(0);
@@ -44,12 +69,18 @@ export default function useTypeRush() {
   // perfil só no cliente — evita divergência de hidratação
   useEffect(() => {
     const prefs = loadPrefs();
-    setLang(prefs.lang);
-    setCombo(prefs.combo);
     setSound(prefs.sound);
     sfx.setSoundEnabled(prefs.sound);
-    setProfile(loadProfile(prefs.lang));
-    engineRef.current = createEngine({ combo: prefs.combo, pool: LANGUAGES[prefs.lang].words });
+    if (duelRef.current) {
+      // duelo: idioma e regras vêm da sala, não das preferências
+      setLang(duelRef.current.lang);
+      engineRef.current = makeEngine({ duel: duelRef.current });
+    } else {
+      setLang(prefs.lang);
+      setCombo(prefs.combo);
+      setProfile(loadProfile(prefs.lang));
+      engineRef.current = makeEngine({ combo: prefs.combo, lang: prefs.lang });
+    }
     setReady(true);
   }, []);
 
@@ -77,6 +108,16 @@ export default function useTypeRush() {
 
   const finalize = useCallback(() => {
     const result = engineRef.current.result();
+    if (duelRef.current) {
+      // duelo: sem recorde local; quem decide o resultado é o juiz da sala
+      setOutcome({ result });
+      setOverdrive((o) => (o.active ? { active: false, id: o.id } : o));
+      setLiveWpm(0);
+      emitClock(now());
+      bump();
+      onFinishRef.current?.(result);
+      return;
+    }
     const saved = recordGame(result, lang);
     setProfile(saved.profile);
     setOutcome({ result, isRecord: saved.isRecord, previousBest: saved.previousBest });
@@ -169,10 +210,29 @@ export default function useTypeRush() {
 
   const onInput = useCallback(
     (value, composing) => {
+      // duelo: antes do "vai!" a digitação não começa a partida
+      if (duelRef.current && engineRef.current.state.status === "idle") return;
       handleEvents(engineRef.current.input(value, { composing, at: now() }));
     },
     [handleEvents]
   );
+
+  /** Duelo: o "vai!" — relógio começa agora, para os dois ao mesmo tempo. */
+  const startNow = useCallback(() => {
+    const engine = engineRef.current;
+    if (engine.state.status !== "idle") return;
+    engine.start(now());
+    emitClock(now());
+    bump();
+  }, [emitClock]);
+
+  /** Duelo: o juiz encerrou a rodada (o adversário caiu primeiro). */
+  const forceFinish = useCallback(() => {
+    const engine = engineRef.current;
+    if (engine.state.status !== "running") return;
+    engine.finish(now());
+    finalize();
+  }, [finalize]);
 
   const onSubmit = useCallback(() => {
     handleEvents(engineRef.current.submit(now()));
@@ -186,8 +246,12 @@ export default function useTypeRush() {
   }, [handleEvents]);
 
   const restart = useCallback(
-    ({ combo: nextCombo = combo, lang: nextLang = lang } = {}) => {
-      engineRef.current = createEngine({ combo: nextCombo, pool: LANGUAGES[nextLang].words });
+    ({ combo: nextCombo = combo, lang: nextLang = lang, duel: nextDuel = duelRef.current } = {}) => {
+      if (nextDuel) {
+        duelRef.current = nextDuel;
+        setLang(nextDuel.lang);
+      }
+      engineRef.current = makeEngine({ combo: nextCombo, lang: nextLang, duel: nextDuel });
       setOutcome(null);
       setDeltas([]);
       setJuice(null);
@@ -271,5 +335,9 @@ export default function useTypeRush() {
     toggleCombo,
     changeLanguage,
     dropDelta,
+    // duelo
+    startNow,
+    forceFinish,
+    getEngine: () => engineRef.current,
   };
 }

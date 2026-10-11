@@ -24,6 +24,9 @@
   --color-lime-soft: rgba(206, 247, 158, 0.12);
   --color-red: #ff5d5d;
   --color-red-soft: rgba(255, 93, 93, 0.14);
+  /* adversário no duelo: frio, distinto do lime (você) e do vermelho (erro) */
+  --color-rival: #a9b4ff;
+  --color-rival-soft: rgba(169, 180, 255, 0.14);
 
   /* Tipografia */
   --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, monospace;

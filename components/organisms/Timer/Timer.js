@@ -19,7 +19,7 @@ import styles from "./Timer.module.css";
  *            sessão. data-overdrive = off | on | grace (tolerância: pisca).
  * Reduced:   pulso, tremor e onda desligados; cor e reserva continuam
  */
-export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive }) {
+export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive, config = GAME_CONFIG }) {
   const { t } = useLocale();
   const rootRef = useRef(null);
   const secRef = useRef(null);
@@ -53,7 +53,7 @@ export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive }
 
       const tension = Math.min(Math.max(1 - ms / GAME_CONFIG.tension.warn, 0), 1);
       doc.style.setProperty("--tension", tension.toFixed(3));
-      fillRef.current.style.transform = `scaleX(${(ms / GAME_CONFIG.maxMs).toFixed(4)})`;
+      fillRef.current.style.transform = `scaleX(${(ms / config.maxMs).toFixed(4)})`;
     });
 
     return () => {
@@ -62,7 +62,7 @@ export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive }
       delete doc.dataset.tension;
       delete doc.dataset.overdrive;
     };
-  }, [subscribeClock]);
+  }, [subscribeClock, config]);
 
   // Tremor curto a cada penalidade
   const lastLoss = deltas.filter((d) => d.ms < 0).at(-1)?.id;
@@ -84,8 +84,9 @@ export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive }
     el.classList.add(styles.odEnter);
   }, [enterId]);
 
-  const startSec = GAME_CONFIG.startMs / 1000;
-  const thresholdPct = (GAME_CONFIG.overdrive.thresholdMs / GAME_CONFIG.maxMs) * 100;
+  const startSec = config.startMs / 1000;
+  const threshold = config.overdrive.thresholdMs;
+  const thresholdPct = Number.isFinite(threshold) ? (threshold / config.maxMs) * 100 : null;
 
   return (
     <div className={styles.root} ref={rootRef} data-level="0" data-overdrive="off">
@@ -100,9 +101,9 @@ export default function Timer({ subscribeClock, deltas, onDeltaDone, overdrive }
         <span className={styles.shock} aria-hidden="true" />
       </div>
       <div className={styles.reserve} aria-hidden="true">
-        <span ref={fillRef} className={styles.fill} style={{ transform: `scaleX(${GAME_CONFIG.startMs / GAME_CONFIG.maxMs})` }} />
-        <span className={styles.threshold} style={{ left: `${thresholdPct}%` }} />
-        <span className={styles.cap}>{GAME_CONFIG.maxMs / 1000}s</span>
+        <span ref={fillRef} className={styles.fill} style={{ transform: `scaleX(${config.startMs / config.maxMs})` }} />
+        {thresholdPct !== null ? <span className={styles.threshold} style={{ left: `${thresholdPct}%` }} /> : null}
+        <span className={styles.cap}>{config.maxMs / 1000}s</span>
       </div>
     </div>
   );

@@ -41,10 +41,12 @@ export default function WordStream({
   onSubmit,
   onRetry,
   onRestart,
+  rivalIndex = null,
 }) {
   const { t } = useLocale();
   const boxRef = useRef(null);
   const caretRef = useRef(null);
+  const rivalRef = useRef(null);
   const inputRef = useRef(null);
   const composingRef = useRef(false);
 
@@ -163,6 +165,23 @@ export default function WordStream({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [juice?.id]);
 
+  // Duelo: traço sob a palavra em que o adversário está (mesma lista nos dois)
+  useLayoutEffect(() => {
+    const mark = rivalRef.current;
+    if (!mark) return;
+    const box = boxRef.current;
+    const el = rivalIndex === null ? null : box?.querySelectorAll("[data-word]")[rivalIndex - first];
+    if (!el) {
+      mark.style.opacity = "0";
+      return;
+    }
+    const br = box.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    mark.style.opacity = "1";
+    mark.style.width = `${r.width}px`;
+    mark.style.transform = `translate3d(${r.left - br.left}px, ${r.bottom - br.top - 3}px, 0)`;
+  });
+
   const handleChange = useCallback(
     (e) => {
       const composing = composingRef.current || e.nativeEvent.isComposing === true;
@@ -233,6 +252,8 @@ export default function WordStream({
             );
           })}
         </div>
+
+        {rivalIndex !== null ? <span ref={rivalRef} className={styles.rival} aria-hidden="true" /> : null}
 
         <span
           ref={caretRef}

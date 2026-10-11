@@ -45,3 +45,9 @@
   padding: 0 var(--space-8);
   font-size: var(--text-base);
 }
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
