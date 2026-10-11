@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Button from "@/components/atoms/Button/Button";
 import Kbd from "@/components/atoms/Kbd/Kbd";
+import SpotifyButton from "@/components/atoms/SpotifyButton/SpotifyButton";
 import YouTubePlayer from "@/components/molecules/YouTubePlayer/YouTubePlayer";
 import LyricStage from "@/components/organisms/LyricStage/LyricStage";
 import MusicResults from "@/components/organisms/MusicResults/MusicResults";
@@ -149,28 +150,33 @@ export default function MusicSession({ pick, onBack }) {
 
   return (
     <div className={`${styles.root} ${styles[phase]}`}>
-      <aside className={styles.side}>
-        <div className={styles.cover}>
-          {media?.cover ? <img src={media.cover} alt="" width={120} height={120} /> : <span>♪</span>}
-          <div className={styles.titles}>
-            <b>{info.track}</b>
-            <span>{info.artist}</span>
-            {info.album ? <em>{info.album}</em> : null}
-            <a className={styles.spotify} href={media?.spotify} target="_blank" rel="noreferrer">
-              {m.listen} ↗
-            </a>
-          </div>
-        </div>
+      {/* clima da música: a capa desfocada vira o fundo da página */}
+      {media?.cover ? (
+        <div className={styles.ambient} style={{ backgroundImage: `url(${media.cover})` }} aria-hidden="true" />
+      ) : null}
 
+      {/* palco: o vídeo em destaque (nunca coberto — política do YouTube); sem vídeo, a capa */}
+      <div className={styles.stage}>
         {videoId && !silent ? (
           <YouTubePlayer ref={playerRef} videoId={videoId} onState={onPlayerState} className={styles.video} />
-        ) : null}
+        ) : (
+          <div className={styles.art}>
+            {media?.cover ? <img src={media.cover} alt="" width={500} height={500} /> : <span>♪</span>}
+          </div>
+        )}
+      </div>
 
-        <p className={styles.credits}>
-          {m.lyricsCredit}
-          {hasAudio ? ` · ${m.audioCredit}` : ""}
-        </p>
-      </aside>
+      <div className={styles.trackbar}>
+        {media?.cover ? <img className={styles.thumb} src={media.cover} alt="" width={56} height={56} /> : null}
+        <div className={styles.titles}>
+          <b>{info.track}</b>
+          <span>
+            {info.artist}
+            {info.album ? <em> · {info.album}</em> : null}
+          </span>
+        </div>
+        <SpotifyButton href={media?.spotify} label={m.listen} />
+      </div>
 
       <section className={styles.main}>
         {phase === "loading" ? <p className={styles.msg}>{m.loading}</p> : null}
@@ -242,6 +248,7 @@ export default function MusicSession({ pick, onBack }) {
           </div>
         ) : null}
 
+
         {phase === "playing" ? (
           <>
             <LyricStage game={game} duration={info.duration} />
@@ -262,6 +269,10 @@ export default function MusicSession({ pick, onBack }) {
             onAnother={onBack}
           />
         ) : null}
+        <p className={styles.credits}>
+          {m.lyricsCredit}
+          {hasAudio ? ` · ${m.audioCredit}` : ""}
+        </p>
       </section>
     </div>
   );

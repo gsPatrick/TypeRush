@@ -1,0 +1,41 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) 0 6px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  white-space: nowrap;
+  color: #0b0c0b;
+  background: #1ed760;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: transform var(--duration-base) var(--ease-out-expo), background-color var(--duration-base);
+}
+
+.root:hover {
+  background: #3be477;
+  transform: translateY(-1px);
+}
+
+.md {
+  height: 40px;
+  font-size: var(--text-sm);
+}
+
+.lg {
+  height: 48px;
+  font-size: var(--text-base);
+  padding-right: var(--space-6);
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.lg .icon {
+  width: 36px;
+  height: 36px;
+}

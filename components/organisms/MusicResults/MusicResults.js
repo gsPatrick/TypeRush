@@ -32,17 +32,6 @@ export default function MusicResults({ outcome, track, media, onAgain, onAnother
         <StatBlock label={t.wpm} value={result.wpm} />
       </div>
 
-      <div className={styles.credit}>
-        {media?.cover ? <img src={media.cover} alt="" width={56} height={56} /> : null}
-        <div>
-          <b>{track.track}</b>
-          <span>{track.artist}</span>
-        </div>
-        <a className={styles.spotify} href={media?.spotify} target="_blank" rel="noreferrer">
-          {m.listen} ↗
-        </a>
-      </div>
-
       <div className={styles.actions}>
         <Button size="lg" onClick={onAgain}>
           {m.playAgain}

@@ -3,7 +3,7 @@
   max-width: calc(var(--column) + var(--gutter) * 2);
   min-height: 100dvh;
   margin: 0 auto;
-  padding: 0 var(--gutter) var(--space-12);
+  padding: 0 var(--gutter) var(--space-6);
 }
 
 .header {
@@ -37,7 +37,7 @@
 }
 
 .main {
-  padding-top: clamp(16px, 4vh, 48px);
+  padding-top: clamp(8px, 2vh, 24px);
 }
 
 @media (max-width: 480px) {
