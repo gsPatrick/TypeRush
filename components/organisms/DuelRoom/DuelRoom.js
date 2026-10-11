@@ -15,16 +15,16 @@ import styles from "./DuelRoom.module.css";
  * O jogo (DuelPlay) fica montado de countdown → playing → result → revanche,
  * para o motor, o áudio e o foco sobreviverem entre rodadas.
  */
-export default function DuelRoom({ code, isHost, name, mode, lang, onLeave }) {
-  const room = useDuelRoom({ code, isHost, name, mode, lang });
+export default function DuelRoom({ code, isHost, name, avatar, mode, lang, onLeave }) {
+  const room = useDuelRoom({ code, isHost, name, avatar, mode, lang });
   return (
     <LocaleProvider lang={room.settings.lang}>
-      <RoomView room={room} code={code} name={name} onLeave={onLeave} />
+      <RoomView room={room} code={code} name={name} avatar={avatar} onLeave={onLeave} />
     </LocaleProvider>
   );
 }
 
-function RoomView({ room, code, name, onLeave }) {
+function RoomView({ room, code, name, avatar, onLeave }) {
   const { lang, t } = useLocale();
   const d = t.duel;
   const inGame = room.phase !== "lobby";
@@ -67,9 +67,9 @@ function RoomView({ room, code, name, onLeave }) {
             </Button>
           </div>
         ) : inGame && room.match ? (
-          <DuelPlay room={room} name={name} />
+          <DuelPlay room={room} name={name} avatar={avatar} />
         ) : (
-          <DuelLobby room={room} code={code} name={name} />
+          <DuelLobby room={room} code={code} name={name} avatar={avatar} />
         )}
       </main>
     </div>

@@ -8,6 +8,8 @@ import styles from "./Countdown.module.css";
 /**
  * 3 · 2 · 1 · vai! — alinhado a `goAt` (performance.now), não a timeouts
  * encadeados: um frame atrasado não empurra o "vai!" de um jogador só.
+ * O "vai!" sai de um único setTimeout até `goAt` (roda em segundo plano);
+ * os números são só exibição.
  */
 export default function Countdown({ goAt, onGo }) {
   const { t } = useLocale();
@@ -20,18 +22,26 @@ export default function Countdown({ goAt, onGo }) {
     goneRef.current = false;
     let raf = 0;
     let last = null;
+
+    const go = () => {
+      if (goneRef.current) return;
+      goneRef.current = true;
+      cancelAnimationFrame(raf);
+      setLabel(t.duel.go);
+      sfx.playCombo();
+      onGoRef.current?.();
+      setTimeout(() => setLabel(null), 700);
+    };
+
+    // O "vai!" é agendado por setTimeout, não pelo rAF: o navegador PAUSA o
+    // rAF em aba em segundo plano, e o jogador que estava em outra aba
+    // começaria atrasado (bug visto com duas janelas no mesmo navegador).
+    // O rAF fica só com os números na tela.
+    const timer = setTimeout(go, Math.max(0, goAt - performance.now()));
+
     const frame = () => {
       const left = goAt - performance.now();
-      if (left <= 0) {
-        if (!goneRef.current) {
-          goneRef.current = true;
-          setLabel(t.duel.go);
-          sfx.playCombo();
-          onGoRef.current?.();
-          setTimeout(() => setLabel(null), 700);
-        }
-        return;
-      }
+      if (left <= 0 || goneRef.current) return;
       const n = Math.ceil(left / 1000);
       if (n !== last) {
         last = n;
@@ -41,7 +51,11 @@ export default function Countdown({ goAt, onGo }) {
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
   }, [goAt, t]);
 
   if (!label) return null;

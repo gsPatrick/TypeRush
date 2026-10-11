@@ -13,5 +13,9 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "trystero": "^0.21.5"
+  },
+  "devDependencies": {
+    "@dicebear/collection": "^9.2.4",
+    "@dicebear/core": "^9.2.4"
   }
 }

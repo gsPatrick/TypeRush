@@ -34,10 +34,10 @@ export default function DuelApp() {
     setSession((s) => (s?.code === code ? s : { code, isHost: isHostOf(code), name: null, mode: null }));
   }, [code]);
 
-  const enter = ({ code: c, name, host, mode, lang: roomLang }) => {
+  const enter = ({ code: c, name, avatar, host, mode, lang: roomLang }) => {
     saveName(name);
     if (host) markHost(c);
-    setSession({ code: c, isHost: host, name, mode, lang: roomLang });
+    setSession({ code: c, isHost: host, name, avatar, mode, lang: roomLang });
     router.replace(`/duel?sala=${c}`);
   };
 

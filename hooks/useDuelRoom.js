@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { randomSeed } from "@/lib/game/rng";
 import { DEFAULT_MODE, DUEL_MODES } from "@/lib/duel/modes";
 import { createReferee, forfeitResult } from "@/lib/duel/referee";
+import { safeAvatar } from "@/lib/duel/avatars";
 
 /**
  * Sala de duelo P2P (Trystero/WebRTC — sem servidor próprio).
@@ -75,7 +76,7 @@ function useSynced(initial) {
   return [state, set, ref];
 }
 
-export default function useDuelRoom({ code, isHost, name, lang: initialLang, mode: initialMode }) {
+export default function useDuelRoom({ code, isHost, name, avatar = null, lang: initialLang, mode: initialMode }) {
   const role = isHost ? "host" : "guest";
   const rivalRole = isHost ? "guest" : "host";
 
@@ -92,6 +93,8 @@ export default function useDuelRoom({ code, isHost, name, lang: initialLang, mod
   const [slow, setSlow] = useState(false); // ninguém apareceu em 15s
   const nameRef = useRef(name);
   nameRef.current = name;
+  const avatarRef = useRef(avatar);
+  avatarRef.current = avatar;
 
   // os handlers de rede são registrados uma vez e leem o estado atual daqui —
   // getters sobre os refs sincronizados, nunca um retrato do último render
@@ -247,20 +250,20 @@ export default function useDuelRoom({ code, isHost, name, lang: initialLang, mod
           }
           setRival({ id: peerId, name: "…", ready: false });
           setConn("connected");
-          sHello({ role: "host", name: R.current.name }, peerId);
+          sHello({ role: "host", name: R.current.name, avatar: avatarRef.current }, peerId);
           sCfg(R.current.settings, peerId);
         } else {
-          sHello({ role: "guest", name: R.current.name }, peerId);
+          sHello({ role: "guest", name: R.current.name, avatar: avatarRef.current }, peerId);
         }
       });
 
       gHello((d, peerId) => {
         if (isHost) {
-          if (R.current.rival?.id === peerId) setRival((rv) => ({ ...rv, name: d.name }));
+          if (R.current.rival?.id === peerId) setRival((rv) => ({ ...rv, name: d.name, avatar: safeAvatar(d.avatar) }));
           return;
         }
         if (d.role !== "host") return;
-        setRival({ id: peerId, name: d.name, ready: true });
+        setRival({ id: peerId, name: d.name, avatar: safeAvatar(d.avatar), ready: true });
         setConn("connected");
       });
 

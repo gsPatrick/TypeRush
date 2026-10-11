@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Avatar from "@/components/atoms/Avatar/Avatar";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./RivalPanel.module.css";
 
@@ -9,7 +10,7 @@ import styles from "./RivalPanel.module.css";
  * mensagem e outra é interpolado localmente (rem − tempo desde a chegada),
  * então anda liso em vez de pular de 160 em 160ms.
  */
-export default function RivalPanel({ name, live, goalMs, playing = true }) {
+export default function RivalPanel({ name, avatar, live, goalMs, playing = true }) {
   const { t } = useLocale();
   const secRef = useRef(null);
   const liveRef = useRef(live);
@@ -38,7 +39,7 @@ export default function RivalPanel({ name, live, goalMs, playing = true }) {
 
   return (
     <div className={`${styles.root} ${down ? styles.down : ""} ${od ? styles.od : ""}`}>
-      <span className={styles.avatar}>{name?.[0]?.toUpperCase() || "?"}</span>
+      <Avatar id={avatar} name={name} size={34} tone="rival" />
       <span className={styles.who}>
         <b>{name}</b>
         <small>{!playing ? "\u00a0" : down ? t.duel.rivalDown : t.duel.rivalAlive}</small>

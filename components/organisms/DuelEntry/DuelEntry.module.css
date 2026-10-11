@@ -75,7 +75,7 @@
 
 .note {
   max-width: 44ch;
-  margin-top: var(--space-4);
+  margin-top: var(--space-2);
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   line-height: 1.6;
@@ -173,4 +173,11 @@
 @media (max-width: 560px) {
   .modes { display: none; }
   .header { justify-content: space-between; }
+}
+
+.avatarBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
 }

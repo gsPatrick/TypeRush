@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Avatar from "@/components/atoms/Avatar/Avatar";
 import Button from "@/components/atoms/Button/Button";
 import Kbd from "@/components/atoms/Kbd/Kbd";
 import * as sfx from "@/lib/audio/sfx";
@@ -8,7 +9,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./DuelResult.module.css";
 
 /** Resultado do duelo: veredito, motivo, os dois lado a lado, placar, revanche. */
-export default function DuelResult({ room, name, mine }) {
+export default function DuelResult({ room, name, avatar, mine }) {
   const { t } = useLocale();
   const d = t.duel;
   const { result, role, rivalRole } = room;
@@ -76,11 +77,13 @@ export default function DuelResult({ room, name, mine }) {
       <p className={styles.reason}>{reason}</p>
 
       <div className={styles.score}>
+        <Avatar id={avatar} name={name} size={44} tone="me" />
         <span className={styles.me}>{name}</span>
         <b className={styles.meScore}>{room.score[role]}</b>
         <span className={styles.x}>×</span>
         <b className={styles.rivalScore}>{room.score[rivalRole]}</b>
         <span className={styles.rivalName}>{rivalName}</span>
+        <Avatar id={room.rival?.avatar} name={rivalName} size={44} tone="rival" />
       </div>
 
       {me || rival ? (

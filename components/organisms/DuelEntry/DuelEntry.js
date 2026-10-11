@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import BrandMark from "@/components/atoms/BrandMark/BrandMark";
 import Button from "@/components/atoms/Button/Button";
+import AvatarPicker from "@/components/molecules/AvatarPicker/AvatarPicker";
 import LanguageSwitch from "@/components/molecules/LanguageSwitch/LanguageSwitch";
 import ModeNav from "@/components/molecules/ModeNav/ModeNav";
 import ModePicker from "@/components/molecules/ModePicker/ModePicker";
 import { DEFAULT_MODE } from "@/lib/duel/modes";
-import { cleanName, loadName, newRoomCode, normalizeCode } from "@/lib/duel/room";
+import { cleanName, loadAvatar, loadName, newRoomCode, normalizeCode, saveAvatar } from "@/lib/duel/room";
+import { randomAvatar, safeAvatar } from "@/lib/duel/avatars";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./DuelEntry.module.css";
 
@@ -23,9 +25,11 @@ export default function DuelEntry({ lang, onLangChange, presetCode, presetHost, 
   const [name, setName] = useState("");
   const [mode, setMode] = useState(DEFAULT_MODE);
   const [joinCode, setJoinCode] = useState("");
+  const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
     setName(loadName() || `${t.duel.you === "você" ? "Jogador" : "Player"} ${Math.floor(100 + Math.random() * 900)}`);
+    setAvatar(safeAvatar(loadAvatar()) || randomAvatar());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -33,13 +37,13 @@ export default function DuelEntry({ lang, onLangChange, presetCode, presetHost, 
 
   const create = () => {
     if (!validName) return;
-    onEnter({ code: newRoomCode(), name: cleanName(name), host: true, mode, lang });
+    onEnter({ code: newRoomCode(), name: cleanName(name), avatar, host: true, mode, lang });
   };
 
   const join = (code) => {
     const c = normalizeCode(code);
     if (!validName || c.length < 4) return;
-    onEnter({ code: c, name: cleanName(name), host: !!presetHost && c === presetCode, mode: null, lang });
+    onEnter({ code: c, name: cleanName(name), avatar, host: !!presetHost && c === presetCode, mode: null, lang });
   };
 
   return (
@@ -57,6 +61,17 @@ export default function DuelEntry({ lang, onLangChange, presetCode, presetHost, 
           <span className={styles.kicker}>{d.nav}</span>
           <h1 className={styles.h1}>{d.title}</h1>
           <p className={styles.lede}>{d.lede}</p>
+          <div className={styles.avatarBox}>
+            <span className={styles.label}>{d.avatar}</span>
+            <AvatarPicker
+              value={avatar}
+              label={d.avatar}
+              onChange={(id) => {
+                setAvatar(id);
+                saveAvatar(id);
+              }}
+            />
+          </div>
           <p className={styles.note}>{d.p2pNote}</p>
         </div>
 

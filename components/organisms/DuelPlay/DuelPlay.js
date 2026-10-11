@@ -27,7 +27,7 @@ import styles from "./DuelPlay.module.css";
  */
 const noop = () => {};
 
-export default function DuelPlay({ room, name }) {
+export default function DuelPlay({ room, name, avatar }) {
   const { t } = useLocale();
   const { match } = room;
   const mode = DUEL_MODES[match.mode];
@@ -110,6 +110,7 @@ export default function DuelPlay({ room, name }) {
       <div className={styles.top}>
         <RivalPanel
           name={room.rival?.name ?? "—"}
+          avatar={room.rival?.avatar}
           live={room.rivalLive}
           goalMs={mode.win === "overdrive" ? mode.goalMs : null}
           playing={room.phase !== "result"}
@@ -167,7 +168,7 @@ export default function DuelPlay({ room, name }) {
       </div>
 
       {room.phase === "result" && room.result ? (
-        <DuelResult room={room} name={name} mine={game.outcome?.result} />
+        <DuelResult room={room} name={name} avatar={avatar} mine={game.outcome?.result} />
       ) : null}
 
       {game.blast ? <OverdriveBlast key={game.blast.id} {...game.blast} onDone={game.clearBlast} /> : null}

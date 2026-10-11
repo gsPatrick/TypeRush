@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Avatar from "@/components/atoms/Avatar/Avatar";
 import Button from "@/components/atoms/Button/Button";
 import LanguageSwitch from "@/components/molecules/LanguageSwitch/LanguageSwitch";
 import ModePicker from "@/components/molecules/ModePicker/ModePicker";
@@ -8,7 +9,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./DuelLobby.module.css";
 
 /** Lobby: link para convidar, quem está na sala, modo/idioma e o "pronto". */
-export default function DuelLobby({ room, code, name }) {
+export default function DuelLobby({ room, code, name, avatar }) {
   const { t } = useLocale();
   const d = t.duel;
   const [copied, setCopied] = useState(false);
@@ -46,10 +47,16 @@ export default function DuelLobby({ room, code, name }) {
         </div>
 
         <div className={styles.players}>
-          <Player name={name} tag={host ? d.host : d.you} ready={host || room.meReady} you t={d} />
+          <Player name={name} avatar={avatar} tag={host ? d.host : d.you} ready={host || room.meReady} you t={d} />
           <span className={styles.vs}>vs</span>
           {room.rival ? (
-            <Player name={room.rival.name} tag={host ? "" : d.host} ready={!host || room.rival.ready} t={d} />
+            <Player
+              name={room.rival.name}
+              avatar={room.rival.avatar}
+              tag={host ? "" : d.host}
+              ready={!host || room.rival.ready}
+              t={d}
+            />
           ) : (
             <div className={`${styles.player} ${styles.empty}`}>
               <span className={styles.pulse} />
@@ -93,10 +100,10 @@ export default function DuelLobby({ room, code, name }) {
   );
 }
 
-function Player({ name, tag, ready, you, t }) {
+function Player({ name, avatar, tag, ready, you, t }) {
   return (
     <div className={`${styles.player} ${you ? styles.you : styles.rival}`}>
-      <span className={styles.avatar}>{name?.[0]?.toUpperCase() || "?"}</span>
+      <Avatar id={avatar} name={name} size={44} tone={you ? "me" : "rival"} />
       <span className={styles.who}>
         <b>{name}</b>
         {tag ? <small>{tag}</small> : null}
