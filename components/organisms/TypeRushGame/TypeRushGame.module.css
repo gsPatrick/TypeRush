@@ -76,3 +76,10 @@
   :global(html[data-tension="3"]) .vignette { animation: none; }
   :global(html[data-overdrive="on"]) .aurora { animation: none; }
 }
+
+/* telas baixas (notebook 720–820px): o resultado precisa caber sem rolar */
+@media (max-height: 820px) {
+  .stage {
+    padding: var(--space-3) 0;
+  }
+}

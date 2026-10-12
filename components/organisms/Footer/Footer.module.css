@@ -38,3 +38,7 @@
 @media (pointer: coarse) {
   .keys { display: none; }
 }
+
+@media (max-height: 820px) {
+  .root { padding: var(--space-3) 0; }
+}

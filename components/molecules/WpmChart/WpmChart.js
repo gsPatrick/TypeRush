@@ -137,7 +137,10 @@ export default function WpmChart({ series, errorMarks, remainingSeries }) {
         ) : null}
       </div>
 
-      <table className={styles.srOnly}>
+      {/* tabela só para leitor de tela — o recorte fica no div: <table> ignora
+          height: 1px e esticava a página com ~850px invisíveis */}
+      <div className={styles.srOnly}>
+      <table>
         <caption>{t.chartTitle}</caption>
         <thead>
           <tr>
@@ -156,6 +159,7 @@ export default function WpmChart({ series, errorMarks, remainingSeries }) {
           ))}
         </tbody>
       </table>
+      </div>
     </figure>
   );
 }
