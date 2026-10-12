@@ -13,16 +13,22 @@ import styles from "./DonatePanel.module.css";
  */
 const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-// "12,50" / "12.5" → 12.5 ; vazio ou inválido → null
-function parseAmount(text) {
-  const n = Number(String(text).replace(/[^\d,.]/g, "").replace(",", "."));
-  return Number.isFinite(n) && n >= 1 && n <= 10000 ? Math.round(n * 100) / 100 : null;
-}
+// "quanto quiser": máscara de banco — só dígitos, preenchendo pelos centavos
+// (5 → 0,05 · 500 → 5,00 · 5000 → 50,00). Teto R$ 10.000,00.
+const MAX_CENTS = 1_000_000;
+const centsOf = (text) => {
+  const digits = String(text).replace(/\D/g, "").replace(/^0+/, "");
+  return digits ? Math.min(MAX_CENTS, Number(digits.slice(0, 7))) : 0;
+};
+const maskCents = (cents) =>
+  cents ? (cents / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "";
+// abaixo de R$ 1 não vale (o banco recusa ou não compensa) → QR sem valor
+const amountOf = (cents) => (cents >= 100 ? cents / 100 : null);
 
 export default function DonatePanel() {
   const [value, setValue] = useState(DEFAULT_VALUE);
-  const [custom, setCustom] = useState(null); // texto digitado em "quanto quiser"
-  const customValue = custom === null ? null : parseAmount(custom);
+  const [custom, setCustom] = useState(null); // centavos em "quanto quiser" (null = usando um chip)
+  const customValue = custom === null ? null : amountOf(custom);
   // modo "quanto quiser": vale o digitado; vazio = QR sem valor (escolhe no app)
   const amount = custom === null ? value : customValue;
   const [svg, setSvg] = useState("");
@@ -82,9 +88,14 @@ export default function DonatePanel() {
           <input
             inputMode="decimal"
             placeholder="0,00"
-            value={custom ?? ""}
-            onFocus={() => setCustom((c) => c ?? "")}
-            onChange={(e) => setCustom(e.target.value.replace(/[^\d,.]/g, "").slice(0, 8))}
+            value={maskCents(custom ?? 0)}
+            onFocus={(e) => {
+              setCustom((c) => c ?? 0);
+              // cursor sempre no fim: a máscara cresce da direita
+              const el = e.currentTarget;
+              requestAnimationFrame(() => el.setSelectionRange?.(el.value.length, el.value.length));
+            }}
+            onChange={(e) => setCustom(centsOf(e.target.value))}
             aria-label="doe o quanto quiser (R$)"
           />
         </span>
@@ -98,7 +109,15 @@ export default function DonatePanel() {
           dangerouslySetInnerHTML={{ __html: svg }}
         />
         <div className={styles.side}>
-          <span className={styles.amount}>{amount ? brl(amount) : "valor livre"}</span>
+          {(() => {
+            const label = amount ? brl(amount) : "valor livre";
+            // --chars: a fonte encolhe para o valor caber na coluna (R$ 10.000,00)
+            return (
+              <span className={styles.amount} style={{ "--chars": Array.from(label).length }}>
+                {label}
+              </span>
+            );
+          })()}
           <span className={styles.hint}>
             {amount
               ? "abra o app do banco e aponte a câmera — o valor já vem preenchido"
