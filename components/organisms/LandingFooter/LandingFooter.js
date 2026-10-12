@@ -14,6 +14,7 @@ export default function LandingFooter() {
           <Link href="/rush">solo</Link>
           <Link href="/duel">duelo</Link>
           <Link href="/music">música</Link>
+          <Link href="/apoie">apoie ☕</Link>
         </nav>
       </div>
       <p className={styles.word} aria-hidden="true">

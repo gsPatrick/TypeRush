@@ -6,11 +6,12 @@ import Mechanics from "@/components/organisms/Mechanics/Mechanics";
 import PlayModes from "@/components/organisms/PlayModes/PlayModes";
 import ResultShowcase from "@/components/organisms/ResultShowcase/ResultShowcase";
 import FinalCta from "@/components/organisms/FinalCta/FinalCta";
+import Donate from "@/components/organisms/Donate/Donate";
 import LandingFooter from "@/components/organisms/LandingFooter/LandingFooter";
 
 /**
  * Landing — arco: chegar (jogo ao vivo) → regras → como funciona (scroll) →
- * mecânicas → modos (solo · duelo · música) → resultado → ação → rodapé.
+ * mecânicas → modos (solo · duelo · música) → resultado → ação → apoio → rodapé.
  */
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
         <PlayModes />
         <ResultShowcase />
         <FinalCta />
+        <Donate />
       </main>
       <LandingFooter />
     </>

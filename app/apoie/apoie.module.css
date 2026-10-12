@@ -1,0 +1,31 @@
+.shell {
+  width: 100%;
+  min-height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: calc(var(--column) + var(--gutter) * 2);
+  height: 72px;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.home {
+  font-size: 1.125rem;
+  color: var(--color-bone);
+  text-decoration: none;
+}
+
+.play {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+  text-decoration: none;
+}
+
+.play:hover {
+  color: var(--color-bone);
+}
