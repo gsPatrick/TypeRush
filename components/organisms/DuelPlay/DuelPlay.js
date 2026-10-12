@@ -126,7 +126,6 @@ export default function DuelPlay({ room, name, avatar }) {
           combo={mode.config.combo.bonusMs > 0}
           active={playing}
           level={mode.config.ramp && mode.win !== "score" ? game.stats.level : 0}
-          broke={game.broke}
         />
 
         <Timer

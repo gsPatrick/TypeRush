@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { createEngine } from "@/lib/game/engine";
-import { GAME_CONFIG, isStreakMilestone } from "@/lib/game/config";
+import { streakTier } from "@/lib/game/config";
 import { now, tensionLevel } from "@/lib/game/clock";
 import { DEFAULT_LANG, LANGUAGES } from "@/lib/game/languages";
 import { loadPrefs, loadProfile, recordGame, savePrefs } from "@/lib/game/storage";
@@ -53,11 +53,10 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
   // pelo subscribeClock, como o relógio principal
   const [overdrive, setOverdrive] = useState({ active: false, id: 0 });
   const [blast, setBlast] = useState(null);
-  // aviso no palco (nível subiu, marco de sequência, sequência quebrada);
-  // um por vez — o mais recente substitui. id remonta a animação.
-  const [callout, setCallout] = useState(null);
-  // sequência quebrada: o contador treme em vermelho (id remonta)
+  // sequência quebrada (com groove ligado): o medidor estilhaça. id remonta.
   const [broke, setBroke] = useState(null);
+  // nível subiu: aviso no palco (id remonta a animação)
+  const [levelUp, setLevelUp] = useState(null);
   const engineRef = useRef(null);
   if (engineRef.current === null) engineRef.current = makeEngine({ combo: true, lang: DEFAULT_LANG, duel });
 
@@ -96,6 +95,7 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
   }, [lang]);
 
   useEffect(() => sfx.installAudioUnlock(), []);
+  useEffect(() => () => sfx.stopGroove(false), []);
 
   const emitClock = useCallback((at) => {
     const ms = engineRef.current.remaining(at);
@@ -114,6 +114,7 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
   );
 
   const finalize = useCallback(() => {
+    sfx.stopGroove(false);
     const result = engineRef.current.result();
     if (duelRef.current) {
       // duelo: sem recorde local; quem decide o resultado é o juiz da sala
@@ -151,16 +152,13 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
           let kind = "wrong";
           if (ev.correct) kind = ev.combo ? "combo" : ev.retry ? "save" : "correct";
           const inOverdrive = engineRef.current.state.od.active;
-          const rules = GAME_CONFIG.streak;
-          const milestone = ev.correct && isStreakMilestone(ev.streak, rules);
-          const brokeStreak = !ev.correct && ev.lostStreak >= rules.breakFrom;
-          if (milestone) {
-            sfx.playStreakMilestone(ev.streak);
-            setCallout({ id: ++deltaId.current, kind: "streak", streak: ev.streak });
-          } else if (brokeStreak) {
-            sfx.playStreakBreak(ev.lostStreak);
-            setCallout({ id: ++deltaId.current, kind: "break", streak: ev.lostStreak });
-            setBroke({ id: deltaId.current, streak: ev.lostStreak });
+          // groove + medidor da sequência: só no solo (no duelo o vão é da regra/meta)
+          const solo = !duelRef.current;
+          const brokeGroove = solo && !ev.correct && streakTier(ev.lostStreak) > 0;
+          if (solo && ev.correct) sfx.setGroove(streakTier(ev.streak));
+          if (brokeGroove) {
+            sfx.stopGroove(true);
+            setBroke({ id: ++deltaId.current, streak: ev.lostStreak });
           } else if (kind === "combo") sfx.playCombo();
           else if (kind === "save") sfx.playRetrySave();
           else if (kind === "correct") sfx.playCorrect(ev.streak, inOverdrive);
@@ -169,7 +167,7 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
         }
         if (ev.type === "level-up") {
           sfx.playLevelUp();
-          setCallout({ id: ++deltaId.current, kind: "level", level: ev.level, bonusMs: ev.bonusMs, penaltyMs: ev.penaltyMs });
+          setLevelUp({ id: ++deltaId.current, level: ev.level, bonusMs: ev.bonusMs, penaltyMs: ev.penaltyMs });
         }
         if (ev.type === "overdrive-start") {
           sfx.playOverdriveStart();
@@ -278,8 +276,9 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
       setJuice(null);
       setOverdrive({ active: false, id: 0 });
       setBlast(null);
-      setCallout(null);
+      setLevelUp(null);
       setBroke(null);
+      sfx.stopGroove(false);
       setLiveWpm(0);
       setRound((r) => r + 1);
       emitClock(now());
@@ -339,8 +338,8 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
       streak: s.streak,
       level: s.level,
     },
-    callout,
     broke,
+    levelUp,
     combo,
     lang,
     sound,

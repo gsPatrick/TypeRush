@@ -1,0 +1,184 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  animation: enter 380ms var(--ease-out-expo) both;
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(10px) scale(0.85); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── número: pulsa no tempo da batida ───────────────── */
+.count {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  animation: pulse var(--beat) ease-out infinite;
+}
+
+.count b {
+  font-weight: 300;
+  font-size: clamp(2.25rem, 1.6rem + 2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-lime);
+}
+
+.num {
+  animation: hit 260ms var(--ease-out-expo);
+}
+
+@keyframes hit {
+  0%   { transform: scale(1.25); color: #fff; }
+  100% { transform: scale(1); }
+}
+
+.count small {
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ash);
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1.07); }
+  60%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+.tierName {
+  font-size: var(--text-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-lime);
+  animation: tierIn 600ms var(--ease-out-expo);
+}
+
+@keyframes tierIn {
+  0%   { opacity: 0; letter-spacing: 0.6em; }
+  100% { opacity: 1; }
+}
+
+.bar {
+  position: relative;
+  width: 140px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-graphite);
+}
+
+.bar span {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: var(--color-lime);
+  transition: transform 220ms var(--ease-out-expo);
+}
+
+/* ── bordas da tela: acendem por fase, no tempo da batida ── */
+.aura {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  --glow: 40px;
+  --alpha: 0.1;
+  box-shadow: inset 0 0 var(--glow) rgba(206, 247, 158, var(--alpha));
+  animation: aura var(--beat) ease-out infinite;
+}
+
+@keyframes aura {
+  0%   { opacity: 1; }
+  70%  { opacity: 0.45; }
+  100% { opacity: 0.45; }
+}
+
+.aura2 { --glow: 70px; --alpha: 0.16; }
+.aura3 { --glow: 110px; --alpha: 0.22; }
+.aura4 { --glow: 160px; --alpha: 0.3; }
+
+.t2 .count b { text-shadow: 0 0 14px rgba(206, 247, 158, 0.45); }
+.t3 .count b { text-shadow: 0 0 22px rgba(206, 247, 158, 0.65); }
+.t4 .count b { color: #fff; text-shadow: 0 0 26px rgba(206, 247, 158, 0.95); }
+.t4 .count { animation-name: pulseHard; }
+
+@keyframes pulseHard {
+  0%   { transform: scale(1.14); }
+  55%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* ── quebrou: o número racha ao meio e cai ─────────── */
+.shatter .count {
+  animation: none;
+}
+
+.halfA,
+.halfB {
+  color: var(--color-red) !important;
+  text-shadow: 0 0 18px rgba(255, 93, 93, 0.5);
+}
+
+.halfA {
+  clip-path: polygon(0 0, 62% 0, 38% 100%, 0 100%);
+  animation: splitA 1.1s var(--ease-out-expo) forwards;
+}
+
+.halfB {
+  position: absolute;
+  left: 0;
+  top: 0;
+  clip-path: polygon(62% 0, 100% 0, 100% 100%, 38% 100%);
+  animation: splitB 1.1s var(--ease-out-expo) forwards;
+}
+
+@keyframes splitA {
+  0%, 12% { transform: none; opacity: 1; }
+  100%    { transform: translate(-18px, 26px) rotate(-14deg); opacity: 0; }
+}
+
+@keyframes splitB {
+  0%, 12% { transform: none; opacity: 1; }
+  100%    { transform: translate(18px, 30px) rotate(12deg); opacity: 0; }
+}
+
+.brokeLabel {
+  font-size: var(--text-micro);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-red);
+  animation: brokeLabel 1.4s var(--ease-out-expo) forwards;
+}
+
+@keyframes brokeLabel {
+  0%   { opacity: 0; transform: translateX(-6px); }
+  10%  { opacity: 1; transform: translateX(5px); }
+  20%  { transform: translateX(-3px); }
+  30%  { transform: none; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.auraBroke {
+  box-shadow: inset 0 0 120px rgba(255, 93, 93, 0.35);
+  animation: auraBroke 700ms ease-out forwards;
+}
+
+@keyframes auraBroke {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root, .count, .num, .tierName, .aura, .t4 .count { animation: none; }
+  .halfA, .halfB { animation: fadeOut 1.1s linear forwards; }
+  @keyframes fadeOut { to { opacity: 0; } }
+}

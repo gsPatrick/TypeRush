@@ -1,4 +1,5 @@
 import LiveStats from "@/components/molecules/LiveStats/LiveStats";
+import StreakMeter from "@/components/molecules/StreakMeter/StreakMeter";
 import Timer from "@/components/organisms/Timer/Timer";
 import WordStream from "@/components/organisms/WordStream/WordStream";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -19,11 +20,13 @@ export default function Arena({ game }) {
         combo={game.combo}
         active={running}
         level={game.stats.level}
-        broke={game.broke}
       />
 
-      {game.callout && (running || game.callout.kind === "break") ? (
-        <Callout key={game.callout.id} callout={game.callout} t={t} />
+      {game.levelUp && running ? (
+        <p key={game.levelUp.id} className={styles.levelUp} role="status">
+          <b>{t.levelUp(game.levelUp.level)}</b>
+          <span>{t.levelRules(game.levelUp.bonusMs, game.levelUp.penaltyMs)}</span>
+        </p>
       ) : null}
 
       <Timer
@@ -50,25 +53,17 @@ export default function Arena({ game }) {
         onRestart={game.restart}
       />
 
-      <p className={`${styles.hint} ${running ? styles.hidden : ""}`}>
-        {t.hintStart} <span>{t.hintSpace}</span> {t.hintEnd}
-      </p>
+      {/* mesmo vão: dica antes de começar, medidor da sequência durante */}
+      <div className={styles.below}>
+        <p className={`${styles.hint} ${running ? styles.hidden : ""}`}>
+          {t.hintStart} <span>{t.hintSpace}</span> {t.hintEnd}
+        </p>
+        {running || game.broke ? (
+          <div className={styles.meter}>
+            <StreakMeter streak={running ? game.stats.streak : 0} broke={game.broke} />
+          </div>
+        ) : null}
+      </div>
     </section>
-  );
-}
-
-/** Aviso no vão acima das métricas: nível, marco de sequência, sequência quebrada. */
-function Callout({ callout: c, t }) {
-  const [title, sub] =
-    c.kind === "level"
-      ? [t.levelUp(c.level), t.levelRules(c.bonusMs, c.penaltyMs)]
-      : c.kind === "streak"
-        ? [`🔥 ${t.streakHot(c.streak)}`, t.streakKeep]
-        : [t.streakBroke, t.streakLost(c.streak)];
-  return (
-    <p className={`${styles.callout} ${styles[c.kind]}`} role="status">
-      <b>{title}</b>
-      <span>{sub}</span>
-    </p>
   );
 }

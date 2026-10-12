@@ -8,6 +8,19 @@
   animation: enter var(--duration-slow) var(--ease-out-expo) both;
 }
 
+.below {
+  position: relative;
+  width: 100%;
+}
+
+/* o medidor fica por cima do vão da dica, sem empurrar o layout */
+.meter {
+  position: absolute;
+  top: 34px; /* abaixo do botão "tentar de novo" da trilha */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .hint {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
@@ -24,8 +37,8 @@
   opacity: 0;
 }
 
-/* aviso: faixa no vão acima das métricas, sobe e some (não empurra o layout) */
-.callout {
+/* nível subiu: faixa no vão acima das métricas, sobe e some (não empurra o layout) */
+.levelUp {
   position: absolute;
   bottom: calc(100% + clamp(8px, 2vh, 20px));
   left: 50%;
@@ -43,10 +56,10 @@
   border: 1px solid rgba(206, 247, 158, 0.25);
   border-radius: var(--radius-pill);
   transform: translateX(-50%);
-  animation: callout 2.2s var(--ease-out-expo) forwards;
+  animation: levelUp 2.2s var(--ease-out-expo) forwards;
 }
 
-.callout b {
+.levelUp b {
   font-weight: 400;
   font-size: var(--text-lg, 1.25rem);
   letter-spacing: var(--tracking-label);
@@ -55,37 +68,13 @@
   text-shadow: 0 0 18px rgba(206, 247, 158, 0.45);
 }
 
-.callout span {
+.levelUp span {
   font-size: var(--text-micro);
   letter-spacing: 0.04em;
   color: var(--color-ash);
 }
 
-/* marco de sequência: mais quente, com brilho */
-.streak {
-  border-color: rgba(206, 247, 158, 0.55);
-  box-shadow: 0 0 28px rgba(206, 247, 158, 0.18);
-}
-
-/* sequência quebrada: vermelho, treme ao entrar */
-.break {
-  border-color: rgba(255, 93, 93, 0.5);
-  animation: callout 2.2s var(--ease-out-expo) forwards, crack 360ms var(--ease-out-expo);
-}
-
-.break b {
-  color: var(--color-red);
-  text-shadow: 0 0 18px rgba(255, 93, 93, 0.45);
-}
-
-@keyframes crack {
-  0%, 100% { translate: 0; }
-  20% { translate: -7px 0; }
-  45% { translate: 6px 0; }
-  70% { translate: -3px 0; }
-}
-
-@keyframes callout {
+@keyframes levelUp {
   0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.85); }
   12%  { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
   75%  { opacity: 1; transform: translate(-50%, -4px) scale(1); }
@@ -98,8 +87,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .break { animation: callout 2.2s linear forwards; }
-  @keyframes callout {
+  @keyframes levelUp {
     0%, 100% { opacity: 0; transform: translateX(-50%); }
     10%, 80% { opacity: 1; transform: translateX(-50%); }
   }
