@@ -6,7 +6,7 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./MusicResults.module.css";
 
 /** Resultado da música: rank carimbado, números e o crédito ao artista. */
-export default function MusicResults({ outcome, onAgain, onAnother, mode = "normal", relaxed = false }) {
+export default function MusicResults({ outcome, onAgain, onAnother, mode = "normal", relaxed = false, speed = 1 }) {
   const { t } = useLocale();
   const m = t.music;
   const { result, isRecord, best } = outcome;
@@ -52,6 +52,7 @@ export default function MusicResults({ outcome, onAgain, onAnother, mode = "norm
           <span className={styles.modeTag}>
             {m.modes[mode].name}
             {relaxed ? ` · ${m.relaxed}` : ""}
+            {speed < 1 ? ` · ${m.speedTag(speed)}` : ""}
           </span>
         </div>
       </div>

@@ -15,6 +15,9 @@ import * as sfx from "@/lib/audio/sfx";
  *   instante (não pode trocar de relógio e saltar);
  * - sem áudio: relógio próprio que começa 3s antes da primeira linha
  *   (ninguém quer 20s de intro em silêncio).
+ * Velocidade (`speed` < 1): o vídeo toca mais devagar e a letra acompanha
+ * sozinha, porque segue a posição do vídeo; sem áudio, o relógio próprio
+ * anda na mesma proporção.
  * Tempo da letra = tempo do áudio − `offset` (ajuste "letra adiantada/atrasada").
  *
  * Performance: rAF chama tick(); React só re-renderiza quando a linha muda,
@@ -22,7 +25,7 @@ import * as sfx from "@/lib/audio/sfx";
  */
 export const ON_FIRE_STREAK = 10;
 
-export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime, mode = "normal", relaxed = false, onOffsetChange }) {
+export default function useMusicGame({ track, offset = 0, hasAudio = false, getAudioTime, mode = "normal", relaxed = false, speed = 1, onOffsetChange }) {
   const lines = useMemo(() => buildLines(parseLrc(track.synced), { relaxed }), [track.synced, relaxed]);
   const engineRef = useRef(null);
   const [, bump] = useReducer((x) => x + 1, 0);
@@ -34,6 +37,7 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
   const audioRef = useRef(getAudioTime);
   audioRef.current = getAudioTime;
   const silentStart = useRef(0);
+  const speedRef = useRef(speed);
   const lastAudio = useRef(0);
   const hasAudioRef = useRef(hasAudio);
   hasAudioRef.current = hasAudio;
@@ -46,7 +50,7 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
       if (typeof audio === "number") lastAudio.current = audio;
       return lastAudio.current - offsetRef.current;
     }
-    return (performance.now() - silentStart.current) / 1000;
+    return ((performance.now() - silentStart.current) / 1000) * speedRef.current;
   }, []);
 
   const finish = useCallback(() => {
@@ -98,15 +102,16 @@ export default function useMusicGame({ track, offset = 0, hasAudio = false, getA
   );
 
   const start = useCallback(() => {
-    engineRef.current = createMusicEngine(lines, { mode, relaxed });
+    engineRef.current = createMusicEngine(lines, { mode, relaxed, speed });
+    speedRef.current = speed;
     const first = lines[0]?.t ?? 0;
-    silentStart.current = performance.now() - Math.max(0, first - 3) * 1000;
+    silentStart.current = performance.now() - (Math.max(0, first - 3) * 1000) / speed;
     lastAudio.current = 0;
     setOutcome(null);
     setJuice(null);
     setStatus("playing");
     sfx.setSfxVolume(0.45);
-  }, [lines, mode, relaxed]);
+  }, [lines, mode, relaxed, speed]);
 
   /**
    * Ajusta o atraso no meio do jogo. Se o ajuste fizer a letra pular para a

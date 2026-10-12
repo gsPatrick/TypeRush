@@ -14,12 +14,15 @@ import {
   getMusicMode,
   getOffset,
   getRelaxed,
+  getSpeed,
+  SPEEDS,
   isCalibrated,
   markCalibrated,
   pushRecent,
   setMusicMode,
   setOffset as saveOffset,
   setRelaxed as saveRelaxed,
+  setSpeed as saveSpeed,
 } from "@/lib/music/storage";
 import { parseYouTubeId } from "@/lib/music/youtube";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -47,6 +50,7 @@ export default function MusicSession({ pick, onBack }) {
   const [changingVideo, setChangingVideo] = useState(false);
   const [mode, setMode] = useState("normal");
   const [relaxed, setRelaxed] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const [calibrated, setCalibrated] = useState(false);
   const clockRef = useRef(null);
   const playerRef = useRef(null);
@@ -56,6 +60,7 @@ export default function MusicSession({ pick, onBack }) {
     let alive = true;
     setMode(getMusicMode());
     setRelaxed(getRelaxed());
+    setSpeed(getSpeed());
     const q = new URLSearchParams({ artist: pick.artist, track: pick.track, duration: String(pick.duration), album: pick.album || "" });
     Promise.all([
       fetch(`/api/music/track?id=${pick.id}`).then(async (r) => (r.ok ? r.json() : Promise.reject(await r.json()))),
@@ -99,6 +104,7 @@ export default function MusicSession({ pick, onBack }) {
     getAudioTime: () => playerRef.current?.time() ?? null,
     mode,
     relaxed,
+    speed,
     onOffsetChange: persistOffset,
   });
 
@@ -106,6 +112,7 @@ export default function MusicSession({ pick, onBack }) {
   const startCalibration = useCallback(() => {
     if (!hasAudio) return;
     setPhase("calibrating");
+    playerRef.current?.setRate(1);
     playerRef.current?.restart();
   }, [hasAudio]);
 
@@ -144,6 +151,7 @@ export default function MusicSession({ pick, onBack }) {
     pushRecent({ ...pick, cover: pick.cover ?? media?.cover ?? null });
     setAudioHint(null);
     if (hasAudio) {
+      playerRef.current?.setRate(speed);
       playerRef.current?.restart();
       // autoplay pode ser bloqueado: avisa se o vídeo não começar
       setTimeout(() => {
@@ -152,7 +160,7 @@ export default function MusicSession({ pick, onBack }) {
     }
     game.start();
     setPhase("playing");
-  }, [track, pick, media, hasAudio, game, m]);
+  }, [track, pick, media, hasAudio, game, m, speed]);
 
   // fim do jogo → resultado (a música segue tocando o final; se falhou, para)
   useEffect(() => {
@@ -372,24 +380,47 @@ export default function MusicSession({ pick, onBack }) {
                     </button>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={relaxed}
-                  className={styles.relaxed}
-                  onClick={() => {
-                    setRelaxed(!relaxed);
-                    saveRelaxed(!relaxed);
-                  }}
-                >
-                  <span className={styles.relaxedText}>
-                    <b>{m.relaxed}</b>
-                    <span className={styles.relaxedHint}>{m.relaxedHint}</span>
-                  </span>
-                  <span className={`${styles.track} ${relaxed ? styles.trackOn : ""}`}>
-                    <span />
-                  </span>
-                </button>
+                <div className={styles.tweaks}>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={relaxed}
+                    className={styles.relaxed}
+                    title={m.relaxedHint}
+                    onClick={() => {
+                      setRelaxed(!relaxed);
+                      saveRelaxed(!relaxed);
+                    }}
+                  >
+                    <span className={styles.relaxedText}>
+                      <b>{m.relaxed}</b>
+                      <span className={styles.relaxedHint}>{m.relaxedHint}</span>
+                    </span>
+                    <span className={`${styles.track} ${relaxed ? styles.trackOn : ""}`}>
+                      <span />
+                    </span>
+                  </button>
+                  <div className={styles.speed}>
+                    <span className={styles.speedLabel}>{m.speedLabel}</span>
+                    <div className={styles.speedRow} role="radiogroup" aria-label={m.speedLabel}>
+                      {SPEEDS.map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          role="radio"
+                          aria-checked={speed === v}
+                          className={`${styles.speedOpt} ${speed === v ? styles.speedOn : ""}`}
+                          onClick={() => {
+                            setSpeed(v);
+                            saveSpeed(v);
+                          }}
+                        >
+                          {m.speedTag(v)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {hasAudio ? (
@@ -462,6 +493,7 @@ export default function MusicSession({ pick, onBack }) {
               hasAudio={hasAudio}
               mode={mode}
               relaxed={relaxed}
+              speed={speed}
               onAgain={start}
               onAnother={onBack}
             />

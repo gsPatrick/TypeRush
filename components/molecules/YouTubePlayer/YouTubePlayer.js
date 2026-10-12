@@ -6,7 +6,7 @@ import styles from "./YouTubePlayer.module.css";
 
 /**
  * Player do YouTube com API imperativa:
- *   ref.current.play() · pause() · restart() · rewind() · time() → s | null · duration()
+ *   ref.current.play() · pause() · restart() · rewind() · setRate(r) · time() → s | null · duration()
  * `time()` só devolve número com o vídeo TOCANDO — pausado/carregando é null,
  * e o relógio do jogo trata null como "parado" em vez de saltar.
  * Fica sempre visível (exigência do YouTube; mínimo 200×200).
@@ -75,6 +75,10 @@ const YouTubePlayer = forwardRef(function YouTubePlayer({ videoId, onState, clas
       if (!readyRef.current) return;
       playerRef.current.pauseVideo();
       playerRef.current.seekTo(0, true);
+    },
+    /** Velocidade (0,5 · 0,75 · 1) — o YouTube mantém o tom da voz. */
+    setRate(rate) {
+      if (readyRef.current) playerRef.current.setPlaybackRate?.(rate);
     },
     time() {
       // 1 = tocando
