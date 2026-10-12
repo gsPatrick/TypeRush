@@ -30,11 +30,12 @@ function makeEngine({ combo, lang, duel }) {
     return createEngine({
       combo: true,
       pool: LANGUAGES[duel.lang].words,
+      longPool: LANGUAGES[duel.lang].long,
       config: duel.config,
       rng: seededRandom(duel.seed),
     });
   }
-  return createEngine({ combo, pool: LANGUAGES[lang].words });
+  return createEngine({ combo, pool: LANGUAGES[lang].words, longPool: LANGUAGES[lang].long });
 }
 
 export default function useTypeRush({ duel = null, onFinish } = {}) {
@@ -51,6 +52,8 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
   // pelo subscribeClock, como o relógio principal
   const [overdrive, setOverdrive] = useState({ active: false, id: 0 });
   const [blast, setBlast] = useState(null);
+  // nível subiu: aviso no palco (id remonta a animação)
+  const [levelUp, setLevelUp] = useState(null);
   const engineRef = useRef(null);
   if (engineRef.current === null) engineRef.current = makeEngine({ combo: true, lang: DEFAULT_LANG, duel });
 
@@ -149,6 +152,10 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
           else if (kind === "correct") sfx.playCorrect(ev.streak, inOverdrive);
           else sfx.playWrong();
           lastJuice = { id: ++deltaId.current, index: ev.index, kind, streak: ev.streak };
+        }
+        if (ev.type === "level-up") {
+          sfx.playLevelUp();
+          setLevelUp({ id: ++deltaId.current, level: ev.level, bonusMs: ev.bonusMs, penaltyMs: ev.penaltyMs });
         }
         if (ev.type === "overdrive-start") {
           sfx.playOverdriveStart();
@@ -257,6 +264,7 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
       setJuice(null);
       setOverdrive({ active: false, id: 0 });
       setBlast(null);
+      setLevelUp(null);
       setLiveWpm(0);
       setRound((r) => r + 1);
       emitClock(now());
@@ -314,7 +322,9 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
       correctWords: s.correctWords,
       errors: s.errors,
       streak: s.streak,
+      level: s.level,
     },
+    levelUp,
     combo,
     lang,
     sound,

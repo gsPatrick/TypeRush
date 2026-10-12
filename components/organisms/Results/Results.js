@@ -67,7 +67,11 @@ export default function Results({ outcome, profile, onRestart }) {
           label={t.survived}
           value={seconds(result.survivedMs)}
           unit="s"
-          hint={result.overdrive.bestMs > 0 ? t.overdriveHint(seconds(result.overdrive.bestMs)) : undefined}
+          hint={
+            [result.level > 1 ? t.levelUp(result.level) : null, result.overdrive.bestMs > 0 ? t.overdriveHint(seconds(result.overdrive.bestMs)) : null]
+              .filter(Boolean)
+              .join(" · ") || undefined
+          }
         />
         <StatBlock
           label={t.bestStreak}

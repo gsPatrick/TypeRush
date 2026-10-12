@@ -80,6 +80,21 @@
   100% { transform: scale(1); color: var(--color-bone); }
 }
 
+/* nível: acende lime quando sobe e esfria */
+.level {
+  min-width: 1ch;
+}
+
+.levelUp {
+  display: inline-block;
+  animation: levelUp 1.2s var(--ease-out-expo);
+}
+
+@keyframes levelUp {
+  0%, 25% { transform: scale(1.5); color: var(--color-lime); text-shadow: 0 0 12px rgba(206, 247, 158, 0.6); }
+  100%    { transform: scale(1); color: var(--color-bone); text-shadow: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .meter i.on, .full i, .bump { animation: none; }
+  .meter i.on, .full i, .bump, .levelUp { animation: none; }
 }

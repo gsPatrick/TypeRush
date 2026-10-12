@@ -125,6 +125,7 @@ export default function DuelPlay({ room, name, avatar }) {
           streak={game.stats.streak}
           combo={mode.config.combo.bonusMs > 0}
           active={playing}
+          level={mode.config.ramp && mode.win !== "score" ? game.stats.level : 0}
         />
 
         <Timer

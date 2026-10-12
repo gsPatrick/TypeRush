@@ -3,13 +3,21 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./LiveStats.module.css";
 
 /** Linha de métricas ao vivo acima do relógio. */
-export default function LiveStats({ wpm, words, errors, streak, combo, active }) {
+export default function LiveStats({ wpm, words, errors, streak, combo, active, level = 0 }) {
   const { t } = useLocale();
   const every = GAME_CONFIG.combo.every;
   const filled = streak % every;
 
   return (
     <div className={`${styles.root} ${active ? styles.active : ""}`}>
+      {level ? (
+        <div className={styles.item}>
+          <span key={level} className={`${styles.value} ${styles.level} ${level > 1 ? styles.levelUp : ""}`}>
+            {level}
+          </span>
+          <span className={styles.label}>{t.level}</span>
+        </div>
+      ) : null}
       <Item label={t.wpm} value={wpm} />
       <Item label={t.words} value={words} />
       <Item label={t.errors} value={errors} tone={errors > 0 ? "red" : undefined} />

@@ -18,7 +18,15 @@ export default function Arena({ game }) {
         streak={game.stats.streak}
         combo={game.combo}
         active={running}
+        level={game.stats.level}
       />
+
+      {game.levelUp && running ? (
+        <p key={game.levelUp.id} className={styles.levelUp} role="status">
+          <b>{t.levelUp(game.levelUp.level)}</b>
+          <span>{t.levelRules(game.levelUp.bonusMs, game.levelUp.penaltyMs)}</span>
+        </p>
+      ) : null}
 
       <Timer
         subscribeClock={game.subscribeClock}

@@ -1,4 +1,5 @@
 .root {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,12 +24,60 @@
   opacity: 0;
 }
 
+/* nível subiu: faixa no vão acima das métricas, sobe e some (não empurra o layout) */
+.levelUp {
+  position: absolute;
+  bottom: calc(100% + clamp(8px, 2vh, 20px));
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 18px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  pointer-events: none;
+  /* fundo próprio: no celular a faixa cai sobre o header (apagado) */
+  background: rgba(11, 12, 11, 0.88);
+  border: 1px solid rgba(206, 247, 158, 0.25);
+  border-radius: var(--radius-pill);
+  transform: translateX(-50%);
+  animation: levelUp 2.2s var(--ease-out-expo) forwards;
+}
+
+.levelUp b {
+  font-weight: 400;
+  font-size: var(--text-lg, 1.25rem);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-lime);
+  text-shadow: 0 0 18px rgba(206, 247, 158, 0.45);
+}
+
+.levelUp span {
+  font-size: var(--text-micro);
+  letter-spacing: 0.04em;
+  color: var(--color-ash);
+}
+
+@keyframes levelUp {
+  0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.85); }
+  12%  { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
+  75%  { opacity: 1; transform: translate(-50%, -4px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -14px) scale(1); }
+}
+
 @keyframes enter {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  @keyframes levelUp {
+    0%, 100% { opacity: 0; transform: translateX(-50%); }
+    10%, 80% { opacity: 1; transform: translateX(-50%); }
+  }
   @keyframes enter {
     from { opacity: 0; }
     to   { opacity: 1; }
