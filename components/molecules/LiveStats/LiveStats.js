@@ -3,10 +3,13 @@ import { useLocale } from "@/lib/i18n/LocaleContext";
 import styles from "./LiveStats.module.css";
 
 /** Linha de métricas ao vivo acima do relógio. */
-export default function LiveStats({ wpm, words, errors, streak, combo, active, level = 0 }) {
+export default function LiveStats({ wpm, words, errors, streak, combo, active, level = 0, broke = null }) {
   const { t } = useLocale();
   const every = GAME_CONFIG.combo.every;
   const filled = streak % every;
+  // sequência "pega fogo" a partir de 5; esquenta em 10, 25 e 50
+  const hot = streak >= GAME_CONFIG.streak.hotFrom;
+  const heat = streak >= 50 ? 4 : streak >= 25 ? 3 : streak >= 10 ? 2 : hot ? 1 : 0;
 
   return (
     <div className={`${styles.root} ${active ? styles.active : ""}`}>
@@ -21,7 +24,17 @@ export default function LiveStats({ wpm, words, errors, streak, combo, active, l
       <Item label={t.wpm} value={wpm} />
       <Item label={t.words} value={words} />
       <Item label={t.errors} value={errors} tone={errors > 0 ? "red" : undefined} />
-      <div className={styles.item}>
+      <div
+        key={broke && streak === 0 ? `broke-${broke.id}` : "streak"}
+        className={`${styles.item} ${styles.streak} ${heat ? styles[`heat${heat}`] : ""} ${
+          broke && streak === 0 ? styles.broke : ""
+        }`}
+      >
+        {hot ? (
+          <span className={styles.flame} aria-hidden="true">
+            🔥
+          </span>
+        ) : null}
         {/* key = streak: cada acerto remonta o número e replaya o "bump" */}
         <span key={streak} className={`${styles.value} ${streak > 0 ? styles.bump : ""}`}>
           {streak}

@@ -95,6 +95,59 @@
   100%    { transform: scale(1); color: var(--color-bone); text-shadow: none; }
 }
 
+/* sequência: esquenta conforme cresce (5 · 10 · 25 · 50) */
+.streak {
+  position: relative;
+  padding: 2px 10px;
+  margin: -2px -10px;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--duration-base), box-shadow var(--duration-base);
+}
+
+.flame {
+  font-size: 0.85em;
+  line-height: 1;
+  align-self: center;
+  animation: flicker 900ms ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0%   { transform: scale(1) rotate(-4deg); }
+  100% { transform: scale(1.12) rotate(4deg); }
+}
+
+.heat1 .value { color: var(--color-lime); }
+.heat2 { background: rgba(206, 247, 158, 0.06); }
+.heat2 .value { color: var(--color-lime); text-shadow: 0 0 10px rgba(206, 247, 158, 0.5); }
+.heat3 { background: rgba(206, 247, 158, 0.1); box-shadow: 0 0 18px rgba(206, 247, 158, 0.15); }
+.heat3 .value { color: var(--color-lime); text-shadow: 0 0 14px rgba(206, 247, 158, 0.7); }
+.heat3 .flame { animation-duration: 500ms; }
+.heat4 { background: rgba(206, 247, 158, 0.14); box-shadow: 0 0 26px rgba(206, 247, 158, 0.28); }
+.heat4 .value { color: #fff; text-shadow: 0 0 16px rgba(206, 247, 158, 0.9); }
+.heat4 .flame { animation-duration: 300ms; font-size: 1em; }
+
+/* quebrou: o contador treme vermelho e esfria */
+.broke {
+  animation: broke 700ms var(--ease-out-expo);
+}
+
+.broke .value {
+  animation: brokeValue 900ms var(--ease-out-expo);
+}
+
+@keyframes broke {
+  0%   { background: rgba(255, 93, 93, 0.22); transform: translateX(0); }
+  15%  { transform: translateX(-6px); }
+  35%  { transform: translateX(5px); }
+  55%  { transform: translateX(-3px); }
+  100% { background: transparent; transform: none; }
+}
+
+@keyframes brokeValue {
+  0%, 30% { color: var(--color-red); }
+  100%    { color: var(--color-bone); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .meter i.on, .full i, .bump, .levelUp { animation: none; }
+  .meter i.on, .full i, .bump, .levelUp, .flame, .broke, .broke .value { animation: none; }
 }

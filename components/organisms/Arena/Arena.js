@@ -19,13 +19,11 @@ export default function Arena({ game }) {
         combo={game.combo}
         active={running}
         level={game.stats.level}
+        broke={game.broke}
       />
 
-      {game.levelUp && running ? (
-        <p key={game.levelUp.id} className={styles.levelUp} role="status">
-          <b>{t.levelUp(game.levelUp.level)}</b>
-          <span>{t.levelRules(game.levelUp.bonusMs, game.levelUp.penaltyMs)}</span>
-        </p>
+      {game.callout && (running || game.callout.kind === "break") ? (
+        <Callout key={game.callout.id} callout={game.callout} t={t} />
       ) : null}
 
       <Timer
@@ -56,5 +54,21 @@ export default function Arena({ game }) {
         {t.hintStart} <span>{t.hintSpace}</span> {t.hintEnd}
       </p>
     </section>
+  );
+}
+
+/** Aviso no vão acima das métricas: nível, marco de sequência, sequência quebrada. */
+function Callout({ callout: c, t }) {
+  const [title, sub] =
+    c.kind === "level"
+      ? [t.levelUp(c.level), t.levelRules(c.bonusMs, c.penaltyMs)]
+      : c.kind === "streak"
+        ? [`🔥 ${t.streakHot(c.streak)}`, t.streakKeep]
+        : [t.streakBroke, t.streakLost(c.streak)];
+  return (
+    <p className={`${styles.callout} ${styles[c.kind]}`} role="status">
+      <b>{title}</b>
+      <span>{sub}</span>
+    </p>
   );
 }
