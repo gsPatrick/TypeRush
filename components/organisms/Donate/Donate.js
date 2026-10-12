@@ -22,7 +22,8 @@ export default function Donate({ as = "section" }) {
           qualquer valor paga o café que mantém o próximo modo saindo.
         </p>
         <p className={styles.fine}>
-          Doação voluntária para a TypeRush · CNPJ {PIX.keyDisplay}. Não libera nada no jogo — é só um obrigado.
+          Doação voluntária. O Pix cai em nome de {PIX.holder} (CNPJ {PIX.keyDisplay}). Não libera nada no jogo — é só
+          um obrigado.
         </p>
       </div>
       <DonatePanel />

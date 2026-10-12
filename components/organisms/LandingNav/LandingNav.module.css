@@ -62,6 +62,23 @@
   background: rgba(233, 236, 230, 0.05);
 }
 
+/* apoie: fica visível também no celular (os links de seção somem) */
+.support {
+  padding: 9px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+  text-decoration: none;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  transition: color var(--duration-base) var(--ease-out-expo), border-color var(--duration-base) var(--ease-out-expo);
+}
+
+.support:hover {
+  color: var(--color-bone);
+  border-color: var(--color-ash);
+}
+
 .cta {
   margin-left: var(--space-2);
   padding: 9px 18px;

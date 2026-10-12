@@ -98,23 +98,87 @@
   background: #dcfab8;
 }
 
+/* chave: rótulo em cima, chave inteira embaixo — nunca quebra no meio */
 .copyKey {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: 10px 14px;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 14px;
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   color: var(--color-slate);
   border: 1px solid var(--color-hairline-strong);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-lg);
 }
 
 .copyKey b {
   font-weight: 400;
   font-size: var(--text-sm);
+  white-space: nowrap;
   color: var(--color-bone);
+}
+
+.holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  text-align: center;
+  color: var(--color-slate);
+}
+
+.holder b {
+  font-weight: 400;
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+}
+
+/* "doe o quanto quiser": linha na largura toda, abaixo dos valores */
+.custom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 6px 0 var(--space-4);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: var(--radius-pill);
+  cursor: text;
+  transition: border-color var(--duration-base);
+}
+
+.customOn {
+  border-color: var(--color-lime);
+}
+
+.customLabel {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ash);
+}
+
+.customField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  color: var(--color-slate);
+}
+
+.customField input {
+  width: 96px;
+  height: 36px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  text-align: right;
+  color: var(--color-bone);
+  background: var(--color-surface-raised);
+  border: 0;
+  border-radius: var(--radius-pill);
+  outline: none;
 }
 
 .copyKey:hover {

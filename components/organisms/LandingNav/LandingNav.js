@@ -39,6 +39,9 @@ export default function LandingNav() {
               {l.label}
             </a>
           ))}
+          <Link href="/apoie" className={styles.support}>
+            Apoie ☕
+          </Link>
           <Link href="/jogar" className={styles.cta}>
             Jogar
           </Link>

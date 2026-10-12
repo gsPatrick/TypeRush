@@ -13,14 +13,24 @@ import styles from "./DonatePanel.module.css";
  */
 const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+// "12,50" / "12.5" → 12.5 ; vazio ou inválido → null
+function parseAmount(text) {
+  const n = Number(String(text).replace(/[^\d,.]/g, "").replace(",", "."));
+  return Number.isFinite(n) && n >= 1 && n <= 10000 ? Math.round(n * 100) / 100 : null;
+}
+
 export default function DonatePanel() {
   const [value, setValue] = useState(DEFAULT_VALUE);
+  const [custom, setCustom] = useState(null); // texto digitado em "quanto quiser"
+  const customValue = custom === null ? null : parseAmount(custom);
+  // modo "quanto quiser": vale o digitado; vazio = QR sem valor (escolhe no app)
+  const amount = custom === null ? value : customValue;
   const [svg, setSvg] = useState("");
   const [copied, setCopied] = useState(null);
 
   const payload = useMemo(
-    () => buildPixPayload({ key: PIX.key, name: PIX.name, city: PIX.city, amount: value, message: PIX.message }),
-    [value]
+    () => buildPixPayload({ key: PIX.key, name: PIX.name, city: PIX.city, amount: amount ?? undefined, message: PIX.message }),
+    [amount]
   );
 
   useEffect(() => {
@@ -53,32 +63,59 @@ export default function DonatePanel() {
             key={v}
             type="button"
             role="radio"
-            aria-checked={v === value}
-            className={`${styles.value} ${v === value ? styles.on : ""}`}
-            onClick={() => setValue(v)}
+            aria-checked={custom === null && v === value}
+            className={`${styles.value} ${custom === null && v === value ? styles.on : ""}`}
+            onClick={() => {
+              setValue(v);
+              setCustom(null);
+            }}
           >
             R$ {v}
           </button>
         ))}
       </div>
 
+      <label className={`${styles.custom} ${custom !== null ? styles.customOn : ""}`}>
+        <span className={styles.customLabel}>doe o quanto quiser</span>
+        <span className={styles.customField}>
+          R$
+          <input
+            inputMode="decimal"
+            placeholder="0,00"
+            value={custom ?? ""}
+            onFocus={() => setCustom((c) => c ?? "")}
+            onChange={(e) => setCustom(e.target.value.replace(/[^\d,.]/g, "").slice(0, 8))}
+            aria-label="doe o quanto quiser (R$)"
+          />
+        </span>
+      </label>
+
       <div className={styles.pay}>
         <div
           className={styles.qr}
           role="img"
-          aria-label={`QR Code Pix de ${brl(value)}`}
+          aria-label={amount ? `QR Code Pix de ${brl(amount)}` : "QR Code Pix, valor livre"}
           dangerouslySetInnerHTML={{ __html: svg }}
         />
         <div className={styles.side}>
-          <span className={styles.amount}>{brl(value)}</span>
-          <span className={styles.hint}>abra o app do banco e aponte a câmera — o valor já vem preenchido</span>
+          <span className={styles.amount}>{amount ? brl(amount) : "valor livre"}</span>
+          <span className={styles.hint}>
+            {amount
+              ? "abra o app do banco e aponte a câmera — o valor já vem preenchido"
+              : "abra o app do banco e aponte a câmera — você digita o valor lá"}
+          </span>
           <button type="button" className={styles.copyMain} onClick={() => copy("code", payload)}>
             {copied === "code" ? "copiado ✓" : "Pix copia e cola"}
           </button>
           <button type="button" className={styles.copyKey} onClick={() => copy("key", PIX.key)}>
-            <span>chave CNPJ</span>
+            <span>chave CNPJ · copiar</span>
             <b>{copied === "key" ? "copiada ✓" : PIX.keyDisplay}</b>
           </button>
+          <span className={styles.holder}>
+            <span>recebedor</span>
+            <b>{PIX.holder}</b>
+            <span>CNPJ {PIX.keyDisplay}</span>
+          </span>
         </div>
       </div>
     </div>
