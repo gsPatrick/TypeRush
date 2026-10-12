@@ -47,6 +47,7 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
   const [combo, setCombo] = useState(true);
   const [lang, setLang] = useState(DEFAULT_LANG);
   const [sound, setSound] = useState(true);
+  const [music, setMusic] = useState(true);
   // último evento de palavra — dispara o "juice" visual na trilha
   const [juice, setJuice] = useState(null);
   // overdrive: estado só muda na entrada/saída; o cronômetro da sessão vai
@@ -77,6 +78,8 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
     const prefs = loadPrefs();
     setSound(prefs.sound);
     sfx.setSoundEnabled(prefs.sound);
+    setMusic(prefs.music);
+    sfx.setMusicEnabled(prefs.music);
     if (duelRef.current) {
       // duelo: idioma e regras vêm da sala, não das preferências
       setLang(duelRef.current.lang);
@@ -302,6 +305,16 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
     if (next) sfx.playCorrect(3); // confirma que ligou
   }, [sound]);
 
+  const toggleMusic = useCallback(() => {
+    const next = !music;
+    setMusic(next);
+    sfx.setMusicEnabled(next);
+    savePrefs({ music: next });
+    // religou no meio de uma sequência: a música volta na fase atual
+    const e = engineRef.current;
+    if (next && !duelRef.current && e.state.status === "running") sfx.setGroove(streakTier(e.state.streak));
+  }, [music]);
+
   const changeLanguage = useCallback(
     (next) => {
       if (next === lang || !LANGUAGES[next]) return;
@@ -343,6 +356,8 @@ export default function useTypeRush({ duel = null, onFinish } = {}) {
     combo,
     lang,
     sound,
+    music,
+    toggleMusic,
     juice,
     overdrive,
     blast,

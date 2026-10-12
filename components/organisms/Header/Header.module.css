@@ -27,6 +27,12 @@
   gap: var(--space-6);
 }
 
+/* som + música lado a lado, coladinhos */
+.audio {
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (max-width: 640px) {
   .right { gap: var(--space-3); }
 }
@@ -34,6 +40,10 @@
 @media (max-width: 420px) {
   /* 375px: marca vira só o símbolo para caber bandeiras + combo + recorde */
   .brand > span:last-child { display: none; }
+  /* som + música mais estreitos; espaços e "recorde" mais justos */
+  .audio > button { width: 28px; }
+  .right { gap: var(--space-2); }
+  .best .label { letter-spacing: 0.04em; }
 }
 
 @media (max-width: 360px) {

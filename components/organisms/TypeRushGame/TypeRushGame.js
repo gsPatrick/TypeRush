@@ -31,6 +31,8 @@ export default function TypeRushGame() {
         onChangeLanguage={game.changeLanguage}
         sound={game.sound}
         onToggleSound={game.toggleSound}
+        music={game.music}
+        onToggleMusic={game.toggleMusic}
         running={running}
         best={game.profile?.best}
       />
