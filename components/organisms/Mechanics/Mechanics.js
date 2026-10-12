@@ -35,8 +35,8 @@ export default function Mechanics() {
           <div className={styles.copy}>
             <h3>Overdrive</h3>
             <p>
-              Passe de 35 segundos e a tela acende. Um segundo cronômetro conta quanto tempo você se mantém lá em
-              cima. Quando cair, explode.
+              Passe de 35 segundos e a tela acende. Lá em cima o acerto vale menos e um segundo cronômetro conta
+              quanto você aguenta. Quando cair, explode.
             </p>
           </div>
         </Reveal>

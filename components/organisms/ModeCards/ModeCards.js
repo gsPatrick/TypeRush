@@ -32,7 +32,7 @@ export default function ModeCards({ reveal = false, numbered = false }) {
                 {numbered ? <kbd className={styles.key}>1</kbd> : null}solo
               </span>
               <h3>Sobrevivência</h3>
-              <p>Trinta segundos, palavras sem fim. Acerto devolve tempo, erro tira. Bata o seu recorde.</p>
+              <p>Trinta segundos, palavras sem fim. Acerto devolve tempo, erro tira — e a cada 20s o nível sobe.</p>
               <span className={styles.cta}>jogar →</span>
             </div>
           </Link>

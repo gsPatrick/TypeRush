@@ -12,6 +12,7 @@ const RULES = [
   ["+2s", "a cada 10 seguidos"],
   ["+0,5s", "na segunda chance"],
   ["35s+", "overdrive"],
+  ["20s", "e o nível sobe"],
 ];
 
 export default function RulesMarquee() {

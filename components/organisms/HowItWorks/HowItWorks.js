@@ -20,7 +20,7 @@ const STATEMENTS = [
   "Você começa com trinta segundos. O relógio só anda quando você aperta a primeira tecla.",
   "Cada palavra certa devolve um segundo. Errou, perde dois. E o relógio nunca passa de sessenta.",
   "Errou por pouco? Backspace volta para a palavra. Acertando agora, você recupera meio segundo.",
-  "Passe de trinta e cinco segundos e entre em overdrive. Quanto tempo você aguenta lá em cima?",
+  "Passe de trinta e cinco e entre em overdrive. A cada vinte segundos o nível sobe: o acerto vale menos e as palavras crescem.",
 ];
 
 export default function HowItWorks() {
